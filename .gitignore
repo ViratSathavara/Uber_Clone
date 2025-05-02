@@ -1,2 +1,12 @@
-.env
-node_modules
+# Ignore .env files in all subdirectories
+**/.env
+
+# Ignore node_modules in all subdirectories
+**/node_modules/
+
+# Other common patterns you might want to add
+.DS_Store
+dist/
+*.log
+.idea/
+.vscode/
