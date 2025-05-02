@@ -166,3 +166,66 @@ Headers:
   "message": "User logged out successfully"
 }
 ```
+
+---
+
+### POST /caption/register
+
+**Description:**  
+This endpoint is used to register a new caption (driver) along with their vehicle details.
+
+**Request Body:**  
+The following fields are required in the request body:
+- `fullname.firstname` (string, minimum 3 characters) - The first name of the caption.
+- `fullname.lastname` (string, minimum 3 characters) - The last name of the caption.
+- `email` (string, valid email format) - The email address of the caption.
+- `password` (string, minimum 6 characters) - The password for the caption account.
+- `vehicle.color` (string, minimum 3 characters) - The color of the vehicle.
+- `vehicle.plate` (string, minimum 3 characters) - The license plate of the vehicle.
+- `vehicle.capacity` (integer, minimum 1) - The seating capacity of the vehicle.
+- `vehicle.vehicleType` (string, one of `car`, `auto`, `bike`) - The type of the vehicle.
+
+**Response Status Codes:**
+- `201 Created` - Caption registered successfully. Returns the caption object and an authentication token.
+- `400 Bad Request` - Validation errors in the request body or caption already exists. Returns an array of error messages.
+- `500 Internal Server Error` - Server error during caption registration.
+
+**Example Request:**
+```json
+{
+  "fullname": {
+    "firstname": "Jane",
+    "lastname": "Doe"
+  },
+  "email": "jane.doe@example.com",
+  "password": "securepassword123",
+  "vehicle": {
+    "color": "Red",
+    "plate": "ABC123",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+**Example Successful Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "caption": {
+    "_id": "64f1c2e9b5d6c9a1e2f3g4h5",
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "jane.doe@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "status": "inactive"
+  }
+}
+```
