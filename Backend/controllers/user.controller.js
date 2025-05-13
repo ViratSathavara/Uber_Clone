@@ -4,8 +4,8 @@ const { validationResult } = require('express-validator');
 const blacklistTokenModel = require('../models/blacklistToken.model');
 
 
-module.exports.registerUser = async (req, res, next) => {
-    
+module.exports.registerUser = async(req, res, next) => {
+
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -14,7 +14,7 @@ module.exports.registerUser = async (req, res, next) => {
 
     const { fullname, email, password } = req.body;
 
-    const isUserAlreadyExist = await captionModel.findOne({ email });
+    const isUserAlreadyExist = await userModel.findOne({ email });
 
     if (isUserAlreadyExist) {
         return res.status(400).json({ error: 'Caption already exists' });
@@ -22,7 +22,7 @@ module.exports.registerUser = async (req, res, next) => {
 
     const hashedPassword = await userModel.hashPassword(password);
 
-    const user = await userServices.createuser({
+    const user = await userServices.createUser({
         firstname: fullname.firstname,
         lastname: fullname.lastname,
         email,
@@ -35,13 +35,13 @@ module.exports.registerUser = async (req, res, next) => {
         status: 'success',
         message: 'User registered successfully',
         data: {
-            user, 
+            user,
             token,
         },
     });
 }
 
-module.exports.loginUser = async (req, res, next) => {
+module.exports.loginUser = async(req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -84,17 +84,17 @@ module.exports.loginUser = async (req, res, next) => {
             token,
         },
     });
-    
+
 }
 
-module.exports.getUserProfile = async (req, res, next) => {
+module.exports.getUserProfile = async(req, res, next) => {
     res.status(200).json(req.user);
 }
 
-module.exports.logoutUser = async (req, res, next) => {
+module.exports.logoutUser = async(req, res, next) => {
     res.clearCookie('token');
 
-    const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
+    // const token = req.cookies.token || req.headers['authorization'] ?.split(' ')[1];
 
     await blacklistTokenModel.create({
         token,

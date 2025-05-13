@@ -1,23 +1,52 @@
-import React from "react";
-import { Button } from "@mui/material";
-import { Link } from "react-router-dom";
+import React from 'react'
+import { UserDataContext } from '../context/UserContext'
+import { Button } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { CaptainDataContext } from '../context/CaptainContext';
+import axios from 'axios';
 
 const Home = () => {
+  const { user } = React.useContext(UserDataContext);
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token')
+
+
+  // const handleLogout = async () => {
+  //   try {
+
+  //     const response = await axios.get(`http://localhost:4000/users/logout`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     if (response.status === 200) {
+  //       localStorage.removeItem('token');
+  //       localStorage.removeItem('user');
+  //       navigate('/login');
+  //     }
+  //   } catch (error) {
+  //     console.error('Logout failed:', error);
+  //   }
+  // };
+  
   return (
-    <div>
-      <div className="bg-cover bg-[url(https://images.unsplash.com/photo-1637044875391-d3e7efc44596?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] h-screen flex flex-col justify-between bg-red-300">
+       <>
+    <h1>
+      Welcome <b>User</b> {user?.data?.user?.fullname?.firstname} {user?.data?.user?.fullname?.lastname}
+    </h1>
 
-        <img src="../assets/Uber-Logo.png" alt="uber-logo" className="w-36" />
-        
-        <div className="items-center bg-white flex gap-10 flex-col justify-center p-14">
-          <h3 className="text-2xl font-medium">Get Started With Uber</h3>
-          <Button variant="contained" className="w-full !border-0 !bg-black !text-white">
-          <Link to='/login'>Contained</Link>
-            </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
+      <Button
+        type="submit"
+        variant="contained"
+        fullWidth
+        // onClick={handleLogout}
+        className="!py-3 !bg-black hover:bg-gray-900 text-white font-medium rounded-lg shadow-sm transition-colors duration-300"
+        >
+        Logout
+      </Button>
+        </>  
+  )
+}
 
-export default Home;
+export default Home

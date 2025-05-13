@@ -1,30 +1,56 @@
 import { TextField, Button } from "@mui/material";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LoginTypeToggle from "./LoginTypeToggle";
+import axios from 'axios'
+import { UserDataContext } from '../context/UserContext';
+import { showSuccessToast, showErrorToast } from '../CommonComponents/Toast';
 
 const Signup = () => {
-  const [userData, setUserData] = useState({}); 
-  const [firstname, setFirstname] = useState(''); 
-  const [lastname, setLastname] = useState(''); 
-  const [email, setEmail] = useState(''); 
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  const handleSubmit = (e) => {
+
+  const { user, setUser } = React.useContext(UserDataContext)
+
+  const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    setUserData({
+
+    const newUser = {
       fullname: {
-        firstname: firstname,
-        lastname: lastname
+        firstname: firstName,
+        lastname: lastName,
       },
-      email: email,
-      password: password
-    })
-    console.log(firstname, lastname, email, password)
-    setEmail('');
-    setPassword('');
-    setFirstname('');
-    setLastname('');
+      email,
+      password,
+    };
+
+    try {
+      const response = await axios.post(`http://localhost:4000/users/register`, newUser);
+      
+      if (response?.status === 201) {
+        showSuccessToast('User Created Successfully...');
+        const userData = response?.data;
+        setUser(userData?.data?.user)
+        localStorage.setItem('token', userData?.data?.token);
+        localStorage.setItem('user', JSON.stringify(userData?.data?.user));
+        setTimeout(() => navigate('/home', { state: { role: 'user' } }), 1500);
+      }
+
+      // Reset form
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setPassword('');
+      
+    } catch (error) {
+      console.error('Signup error:', error);
+      const msg = error.response?.data?.message || 'Something went wrong!';
+      showErrorToast(msg);
+    }
   };
 
   return (
@@ -37,11 +63,11 @@ const Signup = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <form
           onSubmit={(e) => handleSubmit(e)}
-          className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md"
+          className="w-full max-h-[550px] overflow-auto max-w-md p-8 space-y-6 bg-gray-200 rounded-lg shadow-md"
         >
           <div className="flex flex-col justify-center items-center w-full space-y-4">
 
-<div className="w-full">
+            <div className="w-full">
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-1"
@@ -50,39 +76,39 @@ const Signup = () => {
               </label>
               <div className="flex flex-col gap-5">
 
-              <TextField
-                id="firstname"
-                type="text"
-                value={firstname}
-                onChange={(e) => setFirstname(e.target.value)}
-                placeholder="Firstname"
-                variant="outlined"
-                required
-                fullWidth
-                InputProps={{
-                  className: "rounded-lg bg-gray-50",
-                }}
-                InputLabelProps={{
-                  className: "text-gray-500",
-                }}
+                <TextField
+                  id="firstname"
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Firstname"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  InputProps={{
+                    className: "rounded-lg bg-gray-50",
+                  }}
+                  InputLabelProps={{
+                    className: "text-gray-500",
+                  }}
                 />
-              <TextField
-                id="lastname"
-                type="text"
-                value={lastname}
-                onChange={(e) => setLastname(e.target.value)}
-                placeholder="Lastname"
-                variant="outlined"
-                required
-                fullWidth
-                InputProps={{
-                  className: "rounded-lg bg-gray-50",
-                }}
-                InputLabelProps={{
-                  className: "text-gray-500",
-                }}
+                <TextField
+                  id="lastname"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Lastname"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  InputProps={{
+                    className: "rounded-lg bg-gray-50",
+                  }}
+                  InputLabelProps={{
+                    className: "text-gray-500",
+                  }}
                 />
-                </div>
+              </div>
             </div>
 
 
@@ -148,12 +174,12 @@ const Signup = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Do you have an account?
               </label>
-                <Link
-                  to="/login"
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  Signin
-                </Link>
+              <Link
+                to="/login"
+                className="text-blue-600 hover:text-blue-800"
+              >
+                Signin
+              </Link>
             </div>
           </div>
         </form>

@@ -6,16 +6,16 @@ const jwt = require('jsonwebtoken');
 
 const captionSchema = new mongoose.Schema({
     fullname: {
-      firstname: {
-        type: String,
-        required: true,
-        minlength: [3, 'First name must be at least 3 characters long'],
-    },
-    lastname: {
-        type: String,
-        required: true,
-        minlength: [3, 'Last name must be at least 3 characters long'],
-      }
+        firstname: {
+            type: String,
+            required: true,
+            minlength: [3, 'First name must be at least 3 characters long'],
+        },
+        lastname: {
+            type: String,
+            required: true,
+            minlength: [3, 'Last name must be at least 3 characters long'],
+        }
     },
     email: {
         type: String,
@@ -23,21 +23,21 @@ const captionSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         match: [/.+\@.+\..+/, 'Please enter a valid email address'],
-      },
-      password: {
+    },
+    password: {
         type: String,
         required: true,
         select: false,
-      },
-      socketId: {
+    },
+    socketId: {
         type: String,
-      },
-      status: {
+    },
+    status: {
         type: String,
         enum: ['active', 'inactive'],
         default: 'inactive',
-      },
-      vehicle: {
+    },
+    vehicle: {
         color: {
             type: String,
             required: true,
@@ -53,20 +53,20 @@ const captionSchema = new mongoose.Schema({
             required: true,
             min: [1, 'Vehicle capacity must be at least 1'],
         },
-        vehicleType : {
+        vehicleType: {
             type: String,
             enum: ['car', 'auto', 'bike'],
             required: true,
         }
-      },
-      location: {
+    },
+    location: {
         lat: {
             type: Number,
         },
-        long : {
+        long: {
             type: Number,
         }
-      }
+    }
 })
 
 captionSchema.methods.generateAuthToken = function() {
@@ -75,7 +75,7 @@ captionSchema.methods.generateAuthToken = function() {
 }
 
 captionSchema.methods.comparePassword = async function(password) {
- return await bcrypt.compare(password, this.password);
+    return await bcrypt.compare(password, this.password);
 }
 
 captionSchema.statics.hashPassword = async function(password) {

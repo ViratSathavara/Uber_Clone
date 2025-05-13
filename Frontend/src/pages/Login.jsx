@@ -1,7 +1,10 @@
 import { TextField, Button } from "@mui/material";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import LoginTypeToggle from "./LoginTypeToggle";
+import { UserDataContext } from "../context/UserContext";
+import { showErrorToast, showSuccessToast } from "../CommonComponents/Toast";
+import axios from "axios";
 
 const Login = () => {
   const [loginType, setLoginType] = useState("user");
@@ -9,14 +12,40 @@ const Login = () => {
   const [email, setEmail] = useState(''); 
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setUserData({
-      email: email, password: password
-    })
-    setEmail('');
-    setPassword('');
-  };
+  const { user, setUser } = useContext(UserDataContext)
+  
+    const navigate = useNavigate();
+  
+      const handleSubmit = async (e) => {
+      e.preventDefault();
+  
+      const newUser = {
+        email,
+        password,
+      };
+  
+      try {
+        const response = await axios.post(`http://localhost:4000/users/login`, newUser);
+        
+        if (response.status === 200) {
+          showSuccessToast('User Login Successfully...');
+          const userData = response.data;
+        setUser(userData)
+        localStorage.setItem('token', userData?.data?.token);
+        localStorage.setItem('user', JSON.stringify(userData?.data?.user));
+          setTimeout(() => navigate('/home', { state: { role: 'user' } }), 1500);
+
+        }
+  
+        // Reset form
+        setEmail('');
+        setPassword('');
+        
+      } catch (error) {
+        console.error('Signup error:', error);
+        showErrorToast(error);
+      }
+    };
 
   return (
     <>
@@ -28,7 +57,7 @@ const Login = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <form
           onSubmit={(e) => handleSubmit(e)}
-          className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md"
+          className="w-full max-h-[550px] overflow-auto max-w-md p-8 space-y-6 bg-gray-200 rounded-lg shadow-md"
         >
           <div className="flex flex-col justify-center items-center w-full space-y-4">
             <LoginTypeToggle

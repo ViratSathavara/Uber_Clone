@@ -7,11 +7,18 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
+import UserContext from './context/UserContext.jsx'
+import CaptainContext from './context/CaptainContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowerRouter>
-    <App />
-    </BrowerRouter>
+    <UserContext>
+      <CaptainContext>
+
+        <BrowerRouter>
+          <App />
+        </BrowerRouter>
+      </CaptainContext>
+    </UserContext>
   </StrictMode>,
 )

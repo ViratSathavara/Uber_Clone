@@ -1,6 +1,6 @@
-# Node modules
+# # Node modules
 **/node_modules/
 
-# Environment files
-**/.env
-**/.env*
+# # Environment files
+# **/.env
+# **/.env*

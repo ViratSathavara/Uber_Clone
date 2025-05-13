@@ -3,42 +3,42 @@ const captionService = require('../services/caption.service')
 const { validationResult } = require('express-validator');
 const blacklistTokenModel = require('../models/blacklistToken.model');
 
-module.exports.registerCaption = async (req, res) => {
-    
+module.exports.registerCaption = async(req, res) => {
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-const { fullname, email, password, vehicle } = req.body;
+    const { fullname, email, password, vehicle } = req.body;
 
-const isCaptionAlreadyExist = await captionModel.findOne({ email });
- 
-if (isCaptionAlreadyExist) {
-    return res.status(400).json({ error: 'Caption already exists' });
+    const isCaptionAlreadyExist = await captionModel.findOne({ email });
+
+    if (isCaptionAlreadyExist) {
+        return res.status(400).json({ error: 'Caption already exists' });
+    }
+
+    const hashPassword = await captionModel.hashPassword(password);
+
+
+    const captain = await captionService.createCaption({
+        firstname: fullname.firstname,
+        lastname: fullname.lastname,
+        email,
+        password: hashPassword,
+        color: vehicle.color,
+        plate: vehicle.plate,
+        capacity: vehicle.capacity,
+        vehicleType: vehicle.vehicleType
+    })
+
+    const token = captain.generateAuthToken();
+
+    res.status(201).json({ token, captain });
+
 }
 
-const hashPassword = await captionModel.hashPassword(password);
-
-
-const caption = await captionService.createCaption({
-    firstname: fullname.firstname,
-    lastname: fullname.lastname,
-    email,
-    password: hashPassword,
-    color: vehicle.color,
-    plate: vehicle.plate,
-    capacity: vehicle.capacity,
-    vehicleType: vehicle.vehicleType
-})
-
-const token = caption.generateAuthToken();
-
-res.status(201).json({ token, caption });
-
-}
-
-module.exports.loginCaption = async (req, res) => {
+module.exports.loginCaption = async(req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -47,9 +47,9 @@ module.exports.loginCaption = async (req, res) => {
 
     const { email, password } = req.body;
 
-    const caption = await captionModel.findOne({ email }).select('+password');
+    const captain = await captionModel.findOne({ email }).select('+password');
 
-    if (!caption) {
+    if (!captain) {
         return res.status(401).json({
             success: false,
             status: '401',
@@ -57,7 +57,7 @@ module.exports.loginCaption = async (req, res) => {
         });
     }
 
-    const isMatch = await caption.comparePassword(password, caption.password);
+    const isMatch = await captain.comparePassword(password, captain.password);
 
     if (!isMatch) {
         return res.status(401).json({
@@ -67,7 +67,7 @@ module.exports.loginCaption = async (req, res) => {
         });
     }
 
-    const token = await caption.generateAuthToken();
+    const token = await captain.generateAuthToken();
 
 
     res.cookie('token', token);
@@ -77,20 +77,20 @@ module.exports.loginCaption = async (req, res) => {
         status: '200',
         message: 'Caption logged in successfully',
         data: {
-            caption,
+            captain,
             token,
         },
     });
 }
 
-module.exports.getCaptionProfile = async (req, res, next) => {
-    res.status(200).json(req.caption);
+module.exports.getCaptionProfile = async(req, res, next) => {
+    res.status(200).json(req.captain);
 }
 
-module.exports.logoutcaption = async (req, res, next) => {
+module.exports.logoutcaption = async(req, res, next) => {
     res.clearCookie('token');
 
-    const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
+    // const token = req.cookies.token || req.headers['authorization'] ? .split(' ')[1];
 
     await blacklistTokenModel.create({
         token,

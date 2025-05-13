@@ -11,17 +11,20 @@ const cookieParser = require('cookie-parser');
 
 connectDB();
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
-}
-);
+    res.send('Hello World!');
+});
 
 app.use('/users', userRoutes);
-app.use('/caption', captionRoutes);
+app.use('/captain', captionRoutes);
 
 module.exports = app;

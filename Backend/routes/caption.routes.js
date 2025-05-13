@@ -11,8 +11,12 @@ router.post('/register', [
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
     body('vehicle.color').isLength({ min: 3 }).withMessage('Vehicle color must be at least 3 characters long'),
     body('vehicle.plate').isLength({ min: 3 }).withMessage('Vehicle plate must be at least 3 characters long'),
-    body('vehicle.capacity').isInt({min: 1}).withMessage('Vehicle capatioy must be at least 1 sheet'),
-    body('vehicle.vehicleType').isIn(['car', 'auto', 'bike']).withMessage('Vehicle type must be one of the following: car, auto, bike'),  
+    body('vehicle.capacity').isInt({ min: 1 }).withMessage('Vehicle capatioy must be at least 1 sheet'),
+    body('vehicle.vehicleType')
+    .customSanitizer(value => value.toLowerCase())
+    .isIn(['car', 'auto', 'bike'])
+    .withMessage('Vehicle type must be one of the following: car, auto, bike'),
+
 ], captionController.registerCaption);
 
 router.post('/login', [
@@ -20,8 +24,8 @@ router.post('/login', [
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
 ], captionController.loginCaption);
 
-router.get('/profile',authMiddleware.authCaption , captionController.getCaptionProfile);
+router.get('/profile', authMiddleware.authCaption, captionController.getCaptionProfile);
 
-router.get('/logout',authMiddleware.authCaption , captionController.logoutcaption);
+router.get('/logout', authMiddleware.authCaption, captionController.logoutcaption);
 
 module.exports = router;

@@ -1,7 +1,10 @@
 import { TextField, Button } from "@mui/material";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import LoginTypeToggle from "./LoginTypeToggle";
+import { CaptainDataContext } from "../context/CaptainContext";
+import axios from "axios";
+import { showErrorToast, showSuccessToast } from "../CommonComponents/Toast";
 
 const CaptainLogin = () => {
   const [loginType, setLoginType] = useState("captain");
@@ -9,14 +12,41 @@ const [captionData, setCaptionData] = useState({});
   const [email, setEmail] = useState(''); 
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setCaptionData({
-      email: email, password: password
-    })
-    setEmail('');
-    setPassword('');
-  };
+    const { captain, setCaptain } = useContext(CaptainDataContext)
+    
+      const navigate = useNavigate();
+    
+        const handleSubmit = async (e) => {
+        e.preventDefault();
+    
+        const newcaptain = {
+          email,
+          password,
+        };
+    
+        try {
+          const response = await axios.post(`http://localhost:4000/captain/login`, newcaptain);          
+
+          if (response.status === 200) {
+            showSuccessToast('Captain Login Successfully...');
+            const captainData = response.data;
+          setCaptain(captainData?.data?.captain)
+          console.log('captainData?.data', captainData?.data)
+          localStorage.setItem('token', captainData?.data?.token);
+          localStorage.setItem('user', JSON.stringify(captainData?.data?.captain));
+            setTimeout(() => navigate('/captain-home', { state: { role: 'captain' } }), 1500);
+
+          }
+    
+          // Reset form
+          setEmail('');
+          setPassword('');
+          
+        } catch (error) {
+          console.error('Signup error:', error);
+          showErrorToast(error);
+        }
+      };
 
   return (
     <>
@@ -28,7 +58,7 @@ const [captionData, setCaptionData] = useState({});
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md"
+          className="w-full max-h-[550px] overflow-auto max-w-md p-8 space-y-6 bg-gray-200 rounded-lg shadow-md"
         >
           <div className="flex flex-col justify-center items-center w-full space-y-4">
             <LoginTypeToggle loginType={loginType} setLoginType={setLoginType} />
