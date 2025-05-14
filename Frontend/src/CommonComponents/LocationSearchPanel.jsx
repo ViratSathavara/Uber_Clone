@@ -1,30 +1,38 @@
 import React from 'react'
 import LocationPinIcon from '@mui/icons-material/LocationPin';
 
-const LocationSearchPanel = ({ vehiclePanel, setVehiclePanel, setPanelOpen }) => {
-
-    console.log(vehiclePanel, setVehiclePanel)
+const LocationSearchPanel = ({ setSelectedLocation, setVehiclePanel, setPanelOpen }) => {
 
     const locations = [
         {
-            title: 'Padmavati Parking',
-            address: 'Near Padmavati Temple, Satara Road, Pune'
+            currentLocation: 'Padmavati Parking',
+            currentAddress: 'Near Padmavati Temple, Satara Road, Pune',
+            destinationLocation: '20 Tathastu Homes',
+            destinationAddress: 'bankar colony, hadapsar, Hydrabad road, Pune'
         },
         {
-            title: 'Swargate Stand',
-            address: 'Swargate Bus Depot, Pune'
+            currentLocation: 'Swargate Stand',
+            currentAddress: 'Swargate Bus Depot, Pune',
+            destinationLocation: '20 Tathastu Homes',
+            destinationAddress: 'bankar colony, hadapsar, Hydrabad road, Pune'
         },
         {
-            title: 'FC Road Stop',
-            address: 'Near Goodluck Cafe, Fergusson College Road, Pune'
+            currentLocation: 'FC Road Stop',
+            currentAddress: 'Near Goodluck Cafe, Fergusson College Road, Pune',
+            destinationLocation: '20 Tathastu Homes',
+            destinationAddress: 'bankar colony, hadapsar, Hydrabad road, Pune'
         },
         {
-            title: 'Katraj Parking',
-            address: 'Near Katraj Dairy, Pune'
+            currentLocation: 'Katraj Parking',
+            currentAddress: 'Near Katraj Dairy, Pune',
+            destinationLocation: '20 Tathastu Homes',
+            destinationAddress: 'bankar colony, hadapsar, Hydrabad road, Pune'
         },
         {
-            title: 'Shivajinagar Stand',
-            address: 'Shivajinagar Railway Station, Pune'
+            currentLocation: 'Shivajinagar Stand',
+            currentAddress: 'Shivajinagar Railway Station, Pune',
+            destinationLocation: '20 Tathastu Homes',
+            destinationAddress: 'bankar colony, hadapsar, Hydrabad road, Pune'
         }
     ];
 
@@ -37,13 +45,14 @@ const LocationSearchPanel = ({ vehiclePanel, setVehiclePanel, setPanelOpen }) =>
                     onClick={() => {
                         setPanelOpen(false);
                         setVehiclePanel(true);
+                        setSelectedLocation(location)
                     }}
                     className="flex items-center gap-4 border-2 rounded-xl m-3 border-white active:border-black p-1"
                 >
                     <LocationPinIcon />
                     <div>
-                        <h4 className="font-bold">{location.title}</h4>
-                        <h5 className="font-normal">{location.address}</h5>
+                        <h4 className="font-bold">{location.currentLocation}</h4>
+                        <h5 className="font-normal">{location.currentAddress}</h5>
                     </div>
                 </div>
             ))}

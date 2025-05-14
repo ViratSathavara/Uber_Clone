@@ -8,6 +8,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import LocationSearchPanel from '../CommonComponents/LocationSearchPanel';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VehiclePanel from '../CommonComponents/VehiclePanel';
+import ConfirmRide from '../CommonComponents/ConfirmRide';
+import LookingForDriver from '../CommonComponents/LookingForDriver';
 
 const Home = () => {
   const { user } = React.useContext(UserDataContext);
@@ -15,6 +17,9 @@ const Home = () => {
   const [destination, setDestination] = useState('')
   const [panelOpen, setPanelOpen] = useState(false)
   const [vehiclePanel, setVehiclePanel] = useState(false)
+  const [selectedLocation, setSelectedLocation] = useState({})
+  const [confirmRide, setConfirmRide] = useState(false)
+  const [selectedVehicle, setSelectedVehicle] = useState({})
   const navigate = useNavigate();
   const token = localStorage.getItem('token')
 
@@ -88,7 +93,7 @@ const Home = () => {
         <div
           className={`transition-all duration-700 ease-in-out overflow-hidden ${panelOpen ? 'max-h-[70vh]' : 'max-h-0'} bg-white`}
         >
-          <LocationSearchPanel vehiclePanel={vehiclePanel} setVehiclePanel={setVehiclePanel} panelOpen={panelOpen} setPanelOpen={setPanelOpen} />
+          <LocationSearchPanel setSelectedLocation={setSelectedLocation} setVehiclePanel={setVehiclePanel} setPanelOpen={setPanelOpen} />
         </div>
 
       </div>
@@ -101,9 +106,11 @@ const Home = () => {
         >
           <ExpandMoreIcon className=' text-black' />
         </Button>
-        <VehiclePanel />
+        <VehiclePanel setSelectedVehicle={setSelectedVehicle} setVehiclePanel={setVehiclePanel} setConfirmRide={setConfirmRide} />
       </div>
-
+      <div className={`p-3 flex flex-col gap-3 fixed left-0 w-full bg-white shadow-lg transition-all duration-[1000ms] z-50 ${confirmRide ? 'translate-y-0' : 'translate-y-full'} bottom-0`}>
+        <ConfirmRide selectedVehicle={selectedVehicle} selectedLocation={selectedLocation} />
+      </div>
     </div>
   )
 }
