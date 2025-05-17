@@ -12,7 +12,7 @@ const StartPage = () => {
         <div className="items-center bg-white flex gap-10 flex-col justify-center p-14">
           <h3 className="text-2xl font-medium">Get Started With Uber</h3>
           <Button variant="contained" className="w-full !border-0 !bg-black !text-white">
-          <Link to='/login'>Contained</Link>
+          <Link to='/login'>Continue</Link>
             </Button>
         </div>
       </div>

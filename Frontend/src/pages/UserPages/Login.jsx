@@ -2,51 +2,53 @@ import { TextField, Button } from "@mui/material";
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginTypeToggle from "./LoginTypeToggle";
-import { CaptainDataContext } from "../context/CaptainContext";
+import { useUserAuth } from '../../CustomHooks/useAuth';
+import { UserDataContext } from "../../context/UserContext";
+import { showErrorToast, showSuccessToast } from "../../CommonComponents/Toast";
 import axios from "axios";
-import { showErrorToast, showSuccessToast } from "../CommonComponents/Toast";
+import AuthService from "../../services/AuthService";
 
-const CaptainLogin = () => {
-  const [loginType, setLoginType] = useState("captain");
-const [captionData, setCaptionData] = useState({}); 
-  const [email, setEmail] = useState(''); 
+const Login = () => {
+  const [loginType, setLoginType] = useState("user");
+  const [userData, setUserData] = useState({});
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { setAuth } = useUserAuth();
 
-    const { captain, setCaptain } = useContext(CaptainDataContext)
-    
-      const navigate = useNavigate();
-    
-        const handleSubmit = async (e) => {
-        e.preventDefault();
-    
-        const newcaptain = {
-          email,
-          password,
-        };
-    
-        try {
-          const response = await axios.post(`http://localhost:4000/captain/login`, newcaptain);          
+  const { user, setUser } = useContext(UserDataContext)
 
-          if (response.status === 200) {
-            showSuccessToast('Captain Login Successfully...');
-            const captainData = response.data;
-          setCaptain(captainData?.data?.captain)
-          console.log('captainData?.data', captainData?.data)
-          localStorage.setItem('token', captainData?.data?.token);
-          localStorage.setItem('user', JSON.stringify(captainData?.data?.captain));
-            setTimeout(() => navigate('/captain-home', { state: { role: 'captain' } }), 1500);
+  const navigate = useNavigate();
 
-          }
-    
-          // Reset form
-          setEmail('');
-          setPassword('');
-          
-        } catch (error) {
-          console.error('Signup error:', error);
-          showErrorToast(error);
-        }
-      };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newUser = {
+      email,
+      password,
+    };
+
+    try {
+      const response = await axios.post(`http://localhost:4000/users/login`, newUser);
+
+      if (response.status === 200) {
+        showSuccessToast('User Login Successfully...');
+        const userData = response.data;
+        const { token, user } = response.data.data;
+        AuthService.setUserAuth(token, user);
+        setUser(user)
+        navigate('/home');
+
+      }
+
+      // Reset form
+      setEmail('');
+      setPassword('');
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      showErrorToast(error);
+    }
+  };
 
   return (
     <>
@@ -57,12 +59,15 @@ const [captionData, setCaptionData] = useState({});
       />
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => handleSubmit(e)}
           className="w-full max-h-[550px] overflow-auto max-w-md p-8 space-y-6 bg-gray-200 rounded-lg shadow-md"
         >
           <div className="flex flex-col justify-center items-center w-full space-y-4">
-            <LoginTypeToggle loginType={loginType} setLoginType={setLoginType} />
-            
+            <LoginTypeToggle
+              loginType={loginType}
+              setLoginType={setLoginType}
+            />
+
             <div className="w-full">
               <label
                 htmlFor="email"
@@ -110,7 +115,6 @@ const [captionData, setCaptionData] = useState({});
               />
             </div>
 
-
             <div className="w-full pt-4">
               <Button
                 type="submit"
@@ -128,10 +132,10 @@ const [captionData, setCaptionData] = useState({});
               </label>
               <div className="space-x-2">
                 <Link
-                  to="/captainsignup"
+                  to="/signup"
                   className="text-blue-600 hover:text-blue-800"
                 >
-                  Sign up as Captain
+                  Sign up as User
                 </Link>
               </div>
             </div>
@@ -142,4 +146,4 @@ const [captionData, setCaptionData] = useState({});
   );
 };
 
-export default CaptainLogin;
+export default Login;

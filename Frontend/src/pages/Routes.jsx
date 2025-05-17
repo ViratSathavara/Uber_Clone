@@ -1,15 +1,18 @@
 import StartPage from './StartPage';
-import Login from './Login';
-import Signup from './Signup';
-import CaptainLogin from './CaptainLogin';
-import CaptainSignup from './CaptainSignup';
-import Home from './Home';
-import CaptainHome from './CaptainHome';
-import UserLogout from './UserLogout';
-import CaptainLogout from './CaptainLogout';
+import Login from './UserPages/Login';
+import Signup from './UserPages/Signup';
+import CaptainLogin from './CaptainPages/CaptainLogin';
+import CaptainSignup from './CaptainPages/CaptainSignup';
+import Home from './UserPages/Home';
+import CaptainHome from './CaptainPages/CaptainHome';
+import UserLogout from './UserPages/UserLogout';
+import CaptainLogout from './CaptainPages/CaptainLogout';
 import LookingForDriver from '../CommonComponents/LookingForDriver';
-import UserProtectWrapper from './UserProtectWrapper';
-import CaptainProtectWrapper from './CaptainProtectWrapper';
+import UserRiding from './UserPages/UserRiding';
+import InvalidRoute from '../CommonComponents/InvalidRoute';
+import ProtectedRoute from '../services/ProtectedRoute';
+import AuthRoute from '../services/AuthRoute';
+import CaptainRiding from './CaptainPages/CaptainRiding';
 
 export const ROUTES = {
   ROOT: {
@@ -18,39 +21,96 @@ export const ROUTES = {
   },
   LOGIN: {
     path: '/login',
-    element: <Login />,
+    element: (
+      <AuthRoute>
+        <Login />
+      </AuthRoute>
+    ),
   },
   SIGNUP: {
     path: '/signup',
-    element: <Signup />,
+    element: (
+      <AuthRoute>
+        <Signup />
+      </AuthRoute>
+    ),
   },
   CAPTAIN_LOGIN: {
     path: '/captainlogin',
-    element: <CaptainLogin />,
+    element: (
+      <AuthRoute>
+        <CaptainLogin />
+      </AuthRoute>
+    ),
   },
   CAPTAIN_SIGNUP: {
     path: '/captainsignup',
-    element: <CaptainSignup />,
-  },
-  LOOKING_FOR_DRIVER: {
-    path: '/lookingfordriver',
-    element: <LookingForDriver />,
+    element: (
+      <AuthRoute>
+        <CaptainSignup />
+      </AuthRoute>
+    ),
   },
   HOME: {
     path: '/home',
-    element: <UserProtectWrapper><Home /></UserProtectWrapper>,
+    element: (
+      <ProtectedRoute allowedRoles={['user']}>
+        <Home />
+      </ProtectedRoute>
+    ),
   },
   CAPTAIN_HOME: {
     path: '/captain-home',
-    element: <CaptainProtectWrapper><CaptainHome /></CaptainProtectWrapper>,
+    element: (
+      <ProtectedRoute allowedRoles={['captain']}>
+        <CaptainHome />
+      </ProtectedRoute>
+    ),
   },
   USER_LOGOUT: {
     path: '/logout',
-    element: <UserProtectWrapper><UserLogout /></UserProtectWrapper>,
+    element: (
+      <ProtectedRoute allowedRoles={['user']}>
+        <UserLogout />
+      </ProtectedRoute>
+    ),
   },
   CAPTAIN_LOGOUT: {
     path: '/captain-logout',
-    element: <CaptainProtectWrapper><CaptainLogout /></CaptainProtectWrapper>,
+    element: (
+      <ProtectedRoute allowedRoles={['captain']}>
+        <CaptainLogout />
+      </ProtectedRoute>
+    ),
+  },
+  LOOKING_FOR_DRIVER: {
+    path: '/lookingfordriver',
+    element: (
+      <ProtectedRoute allowedRoles={['user']}>
+        <LookingForDriver />
+      </ProtectedRoute>
+    ),
+  },
+  RIDING: {
+    path: '/riding',
+    element: (
+      <ProtectedRoute allowedRoles={['user']}>
+        <UserRiding />
+      </ProtectedRoute>
+    ),
+  },
+  CAPTAIN_RIDING: {
+    path: '/captain-riding',
+    element: (
+      <ProtectedRoute allowedRoles={['captain']}>
+        <CaptainRiding />
+      </ProtectedRoute>
+    ),
+  },
+  // Catch-all route for invalid paths
+  NOT_FOUND: {
+    path: '*',
+    element: <InvalidRoute />,
   },
 };
 

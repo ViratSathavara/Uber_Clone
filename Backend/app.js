@@ -7,7 +7,8 @@ const connectDB = require('./db/db');
 const userRoutes = require('./routes/user.route');
 const captionRoutes = require('./routes/caption.routes');
 const cookieParser = require('cookie-parser');
-
+const mapsRoutes = require('./routes/maps.routes');
+const rideRoutes = require('./routes/rides.routes');
 
 connectDB();
 
@@ -19,6 +20,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use('/maps', mapsRoutes);
+app.use('/ride', rideRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');

@@ -6,59 +6,18 @@ import { useNavigate } from 'react-router-dom';
 import LookingForDriver from './LookingForDriver';
 import DriverProfile from './DriverProfile';
 
-const ConfirmRide = ({ selectedLocation, selectedVehicle }) => {
+const ConfirmRide = ({ vehicleData, createRide, pickup, destination }) => {
+  console.log(vehicleData)
   const navigate = useNavigate();
   const [rideStatus, setRideStatus] = useState('confirm');
   const [driverData, setDriverData] = useState(null);
 
-  const handleConfirmRide = async () => {
-    setRideStatus('searching');
-    
-    try {
-      // Simulate API call to find driver (2 second delay for testing)
-      const driver = await mockFindDriverAPI();
-      
-      if (driver) {
-        setDriverData({
-          id: 'driver123',
-          name: 'Rajesh Kumar',
-          rating: 4.7,
-          carModel: 'Hyundai Creta',
-          licensePlate: 'DL5CAB1234',
-          eta: '3 min',
-          phone: '+919876543210',
-          image: 'https://img.freepik.com/free-photo/man-fastening-safety-belt-car_1303-32008.jpg?uid=R56702273&ga=GA1.1.233314606.1746901734&semt=ais_hybrid&w=740',
-          totalRides: 245,
-          carColor: 'White',
-          carYear: 2020
-        });
-        setRideStatus('driver_found');
-      } else {
-        setRideStatus('not_found');
-      }
-    } catch (error) {
-      console.error('Error finding driver:', error);
-      setRideStatus('not_found');
-    }
-  };
-
-  // Mock API function that returns driver data after 2 seconds
-  const mockFindDriverAPI = () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Always resolve with true for testing (driver found)
-        resolve(true);
-      }, 2000); // 2 second delay
-    });
-  };
 
   // Render different screens based on ride status
   switch (rideStatus) {
     case 'searching':
       return (
         <LookingForDriver 
-          selectedLocation={selectedLocation} 
-          selectedVehicle={selectedVehicle} 
         />
       );
     
@@ -66,8 +25,7 @@ const ConfirmRide = ({ selectedLocation, selectedVehicle }) => {
       return (
         <DriverProfile 
           driver={driverData}
-          vehicle={selectedVehicle}
-          location={selectedLocation}
+          vehicle={vehicleData}
           onCancel={() => setRideStatus('confirm')}
         />
       );
@@ -95,13 +53,13 @@ const ConfirmRide = ({ selectedLocation, selectedVehicle }) => {
             {/* Vehicle Details */}
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
               <img
-                src={selectedVehicle?.image}
-                alt={selectedVehicle?.name}
-                className="w-16 h-16 object-contain"
+                src={vehicleData?.image}
+                alt={vehicleData?.name}
+                className="w-20 h-20 object-contain"
               />
               <div>
-                <h1 className="text-xl font-semibold">{selectedVehicle?.name}</h1>
-                <p className="text-gray-600">{selectedVehicle?.description}</p>
+                <h1 className="text-xl font-semibold">{vehicleData?.name}</h1>
+                <p className="text-gray-600">{vehicleData?.description}</p>
               </div>
             </div>
 
@@ -111,8 +69,7 @@ const ConfirmRide = ({ selectedLocation, selectedVehicle }) => {
                 <AddLocationIcon className="text-black text-3" />
                 <h1 className="text-sm font-medium text-gray-500">Pickup Location</h1>
               </div>
-              <h2 className="text-lg font-semibold mt-1">{selectedLocation?.currentLocation}</h2>
-              <h3 className="text-gray-600">{selectedLocation?.currentAddress}</h3>
+              <h2 className="text-lg font-semibold mt-1">{pickup}</h2>
             </div>
 
             {/* Destination Location */}
@@ -121,18 +78,21 @@ const ConfirmRide = ({ selectedLocation, selectedVehicle }) => {
                 <WhereToVoteIcon className="text-black text-3" />
                 <h1 className="text-sm font-medium text-gray-500">Destination Location</h1>
               </div>
-              <h2 className="text-lg font-semibold mt-1">{selectedLocation?.destinationLocation}</h2>
-              <h3 className="text-gray-600">{selectedLocation?.destinationAddress}</h3>
+              <h2 className="text-lg font-semibold mt-1">{destination}</h2>
             </div>
 
             {/* Price */}
             <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
               <h1 className="text-lg font-medium">Price</h1>
-              <h2 className="text-xl font-bold text-blue-600">{selectedVehicle?.price}</h2>
+              <h2 className="text-xl font-bold text-blue-600">{vehicleData?.price}</h2>
             </div>
 
             <Button
-              onClick={handleConfirmRide}
+              onClick={() => {
+                createRide()
+                setRideStatus('searching');
+              }
+              }
               className="w-full py-3 !bg-green-600 !text-white font-bold rounded-lg hover:!bg-green-700 transition"
             >
               Confirm Ride

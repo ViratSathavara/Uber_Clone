@@ -1,51 +1,51 @@
 import { TextField, Button } from "@mui/material";
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import LoginTypeToggle from "./LoginTypeToggle";
-import { UserDataContext } from "../context/UserContext";
-import { showErrorToast, showSuccessToast } from "../CommonComponents/Toast";
+import LoginTypeToggle from "../UserPages/LoginTypeToggle";
+import { CaptainDataContext } from "../../context/CaptainContext";
 import axios from "axios";
+import { showErrorToast, showSuccessToast } from "../../CommonComponents/Toast";
+import AuthService from "../../services/AuthService";
 
-const Login = () => {
-  const [loginType, setLoginType] = useState("user");
-  const [userData, setUserData] = useState({}); 
-  const [email, setEmail] = useState(''); 
+const CaptainLogin = () => {
+  const [loginType, setLoginType] = useState("captain");
+  const [captionData, setCaptionData] = useState({});
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { user, setUser } = useContext(UserDataContext)
-  
-    const navigate = useNavigate();
-  
-      const handleSubmit = async (e) => {
-      e.preventDefault();
-  
-      const newUser = {
-        email,
-        password,
-      };
-  
-      try {
-        const response = await axios.post(`http://localhost:4000/users/login`, newUser);
-        
-        if (response.status === 200) {
-          showSuccessToast('User Login Successfully...');
-          const userData = response.data;
-        setUser(userData)
-        localStorage.setItem('token', userData?.data?.token);
-        localStorage.setItem('user', JSON.stringify(userData?.data?.user));
-          setTimeout(() => navigate('/home', { state: { role: 'user' } }), 1500);
+  const { captain, setCaptain } = useContext(CaptainDataContext)
 
-        }
-  
-        // Reset form
-        setEmail('');
-        setPassword('');
-        
-      } catch (error) {
-        console.error('Signup error:', error);
-        showErrorToast(error);
-      }
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newcaptain = {
+      email,
+      password,
     };
+
+    try {
+      const response = await axios.post(`http://localhost:4000/captain/login`, newcaptain);
+
+      if (response.status === 200) {
+        showSuccessToast('Captain Login Successfully...');
+        setCaptain(response?.data?.data?.captain)
+        const { token, captain } = response.data.data;
+        AuthService.setCaptainAuth(token, captain);
+        navigate('/captain-home');
+
+      }
+
+      // Reset form
+      setEmail('');
+      setPassword('');
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      showErrorToast(error);
+    }
+  };
 
   return (
     <>
@@ -56,14 +56,11 @@ const Login = () => {
       />
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <form
-          onSubmit={(e) => handleSubmit(e)}
+          onSubmit={handleSubmit}
           className="w-full max-h-[550px] overflow-auto max-w-md p-8 space-y-6 bg-gray-200 rounded-lg shadow-md"
         >
           <div className="flex flex-col justify-center items-center w-full space-y-4">
-            <LoginTypeToggle
-              loginType={loginType}
-              setLoginType={setLoginType}
-            />
+            <LoginTypeToggle loginType={loginType} setLoginType={setLoginType} />
 
             <div className="w-full">
               <label
@@ -112,6 +109,7 @@ const Login = () => {
               />
             </div>
 
+
             <div className="w-full pt-4">
               <Button
                 type="submit"
@@ -129,10 +127,10 @@ const Login = () => {
               </label>
               <div className="space-x-2">
                 <Link
-                  to="/signup"
+                  to="/captainsignup"
                   className="text-blue-600 hover:text-blue-800"
                 >
-                  Sign up as User
+                  Sign up as Captain
                 </Link>
               </div>
             </div>
@@ -143,4 +141,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default CaptainLogin;

@@ -9,15 +9,17 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import UserContext from './context/UserContext.jsx'
 import CaptainContext from './context/CaptainContext.jsx'
+import { SocketProvider } from './context/SocketContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <UserContext>
       <CaptainContext>
-
-        <BrowerRouter>
-          <App />
-        </BrowerRouter>
+        <SocketProvider>
+          <BrowerRouter>
+            <App />
+          </BrowerRouter>
+        </SocketProvider>
       </CaptainContext>
     </UserContext>
   </StrictMode>,
