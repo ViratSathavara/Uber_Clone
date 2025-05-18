@@ -12,7 +12,7 @@ const LocationSearchPanel = ({ pickup, destination, setPanelOpen, setVehiclePane
         setPanelOpen(false);
         setVehiclePanel(true);
 
-        const res = await axios.get(`http://localhost:4000/ride/get-fare`, {
+        const res = await axios.get(`${import.meta.env.VITE_BASE_HOSTED_URI}/ride/get-fare`, {
             params: { pickup, destination },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('user_token')}`,

@@ -19,35 +19,51 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const newUser = {
-      email,
-      password,
-    };
-
-    try {
-      const response = await axios.post(`http://localhost:4000/users/login`, newUser);
-
-      if (response.status === 200) {
-        showSuccessToast('User Login Successfully...');
-        const { token, user } = response.data.data;
-        AuthService.setUserAuth(token, user);
-        setUser(user);
-        navigate('/home');
-
-      }
-
-      // Reset form
-      setEmail('');
-      setPassword('');
-
-    } catch (error) {
-      console.error('Signup error:', error);
-      showErrorToast(error);
-    }
+  const newUser = {
+    email,
+    password,
   };
+
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_HOSTED_URI}/users/login`, 
+      newUser,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      showSuccessToast('User Login Successfully...');
+      const { token, user } = response.data.data;
+      AuthService.setUserAuth(token, user);
+      setUser(user);
+      navigate('/home');
+    }
+
+    // Reset form
+    setEmail('');
+    setPassword('');
+
+  } catch (error) {
+    console.error('Login error:', error);
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      showErrorToast(error.response.data.message || 'Login failed');
+    } else if (error.request) {
+      // The request was made but no response was received
+      showErrorToast('Network error - could not connect to server');
+    } else {
+      // Something happened in setting up the request
+      showErrorToast('Error setting up login request');
+    }
+  }
+};
 
   return (
     <>

@@ -40,7 +40,7 @@ const handleVerify = async () => {
 
     // Change to POST request and send data in body
     const response = await axios.post(
-      'http://localhost:4000/ride/start-ride',
+      `${import.meta.env.VITE_BASE_HOSTED_URI}/ride/start-ride`,
       {
         rideId: confirmRideData._id,
         otp: enteredOtp

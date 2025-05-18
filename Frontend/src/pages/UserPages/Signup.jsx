@@ -35,7 +35,7 @@ const Signup = () => {
     };
 
     try {
-      const response = await axios.post(`http://localhost:4000/users/register`, newUser);
+      const response = await axios.post(`${import.meta.env.VITE_BASE_HOSTED_URI}/users/register`, newUser);
       
       if (response?.status === 201) {
         showSuccessToast('User Created Successfully...');

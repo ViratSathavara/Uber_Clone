@@ -68,7 +68,7 @@ const Home = () => {
         throw new Error('Token has expired');
       }
 
-      const res = await axios.get(`http://localhost:4000/maps/get-suggestions`, {
+      const res = await axios.get(`${import.meta.env.VITE_BASE_HOSTED_URI}/maps/get-suggestions`, {
         params: { input: value },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -106,7 +106,7 @@ const Home = () => {
 
     if (value.trim().length > 0) {
       try {
-        const res = await axios.get(`http://localhost:4000/maps/get-suggestions`, {
+        const res = await axios.get(`${import.meta.env.VITE_BASE_HOSTED_URI}/maps/get-suggestions`, {
           params: { input: value },
           headers: {
             Authorization: `Bearer ${token}`,
@@ -140,7 +140,7 @@ const Home = () => {
         throw new Error('Pickup, destination, and vehicle type are required');
       }
       const res = await axios.post(
-        `http://localhost:4000/ride/create`,
+        `${import.meta.env.VITE_BASE_HOSTED_URI}/ride/create`,
         {  // Request body
           pickup,
           destination,

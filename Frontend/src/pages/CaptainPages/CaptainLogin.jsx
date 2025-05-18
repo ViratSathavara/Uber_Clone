@@ -25,7 +25,7 @@ const CaptainLogin = () => {
     };
 
     try {
-      const response = await axios.post(`http://localhost:4000/captain/login`, newcaptain);
+      const response = await axios.post(`${import.meta.env.VITE_BASE_HOSTED_URI}/captain/login`, newcaptain);
 
       if (response.status === 200) {
         showSuccessToast('Captain Login Successfully...');

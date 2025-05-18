@@ -16,7 +16,7 @@ const CaptainRiding = () => {
 
     const finishRidePopup = async () => {
 
-        const response = await axios.post('http://localhost:4000/ride/end-ride',
+        const response = await axios.post(`${import.meta.env.VITE_BASE_HOSTED_URI}/ride/end-ride`,
             {
                 rideId: location?.state._id,
             },
