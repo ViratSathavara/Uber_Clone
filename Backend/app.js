@@ -13,8 +13,12 @@ const rideRoutes = require('./routes/rides.routes');
 connectDB();
 
 app.use(cors({
-    origin: [process.env.FRONTEND_HOSTED_URL],
-    credentials: true
+    origin: [
+        'https://uber-clone-6qea.onrender.com',
+        'http://localhost:5173' // for local development
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
 
 app.use(express.json());
