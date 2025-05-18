@@ -3,7 +3,33 @@ import AddLocationIcon from '@mui/icons-material/AddLocation';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import StarIcon from '@mui/icons-material/Star';
 
-const DriverProfile = ({ driver, vehicle, location }) => {
+const DriverProfile = ({ driver, vehicle }) => {
+  const OTPBoxes = ({ otp }) => {
+    const digits = otp ? otp.toString().split('') : [];
+    
+    return (
+      <div className="flex justify-center space-x-2">
+        {digits.length > 0 ? (
+          digits.map((digit, index) => (
+            <div 
+              key={index}
+              className="w-8 h-8 flex items-center justify-center border-2 border-blue-500 rounded-lg text-xl font-bold bg-blue-50"
+            >
+              {digit}
+            </div>
+          ))
+        ) : (
+          Array.from({ length: 4 }).map((_, index) => (
+            <div 
+              key={index}
+              className="w-12 h-12 border-2 border-gray-300 rounded-lg bg-gray-100"
+            />
+          ))
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="p-6 max-w-md h-screen overflow-auto mx-auto bg-white rounded-xl shadow-md">
       <h1 className="text-2xl font-bold text-center mb-6">Driver Details</h1>
@@ -13,7 +39,7 @@ const DriverProfile = ({ driver, vehicle, location }) => {
         {/* Driver Avatar */}
         <div className="flex flex-col items-center justify-center gap-3">
           <img
-            src={driver?.image || 'https://via.placeholder.com/80'} // Fallback image
+            src={driver?.image || 'https://cdn-icons-png.flaticon.com/512/1535/1535791.png'}
             alt={driver?.name}
             className="w-20 h-20 rounded-full object-cover border-2 border-blue-500"
           />
@@ -23,16 +49,17 @@ const DriverProfile = ({ driver, vehicle, location }) => {
           </div>
         </div>
         <div className='flex flex-col items-end gap-2'>
-
-          <h2 className="text-xl font-bold">{driver?.name || 'Driver Name'}</h2>
-          <p className="text-gray-600">{driver?.carModel || 'Car Model'}</p>
+          <h2 className="text-xl font-bold">
+            {driver?.captain?.fullname?.firstname + " " + driver?.captain?.fullname?.lastname}
+          </h2>
+          <p className="text-sm font-medium text-gray-700">
+            <span className="font-normal uppercase">{driver?.captain?.vehicle?.plate || 'ABC-1234'}</span>
+          </p>
           
-          <p className="text-sm font-medium text-gray-700">
-            <span className="font-normal">{driver?.licensePlate || 'ABC-1234'}</span>
-          </p>
-          <p className="text-sm font-medium text-gray-700">
-            ETA: <span className="font-normal text-green-600">{driver?.eta || '2 min'}</span>
-          </p>
+          {/* OTP Section */}
+          <div className="mt-2">
+            <OTPBoxes otp={driver?.otp} />
+          </div>
         </div>
       </div>
 
@@ -57,8 +84,8 @@ const DriverProfile = ({ driver, vehicle, location }) => {
             <AddLocationIcon className="text-black text-3" />
             <h1 className="text-sm font-medium text-gray-500">Pickup Location</h1>
           </div>
-          <h2 className="text-lg font-semibold mt-1">{location?.currentLocation}</h2>
-          <h3 className="text-gray-600">{location?.currentAddress}</h3>
+          <h3 className="text-black">{driver?.fullPickup?.structured_formatting?.main_text}</h3>
+          <p className="text-gray-600">{driver?.pickup}</p>
         </div>
 
         {/* Destination Location */}
@@ -67,14 +94,8 @@ const DriverProfile = ({ driver, vehicle, location }) => {
             <WhereToVoteIcon className="text-black text-3" />
             <h1 className="text-sm font-medium text-gray-500">Destination Location</h1>
           </div>
-          <h2 className="text-lg font-semibold mt-1">{location?.destinationLocation}</h2>
-          <h3 className="text-gray-600">{location?.destinationAddress}</h3>
-        </div>
-
-        {/* Price */}
-        <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
-          <h1 className="text-lg font-medium">Price</h1>
-          <h2 className="text-xl font-bold text-blue-600">{vehicle?.price}</h2>
+          <h3 className="text-black">{driver?.fullDestination?.structured_formatting?.main_text}</h3>
+          <p className="text-gray-600">{driver?.destination}</p>
         </div>
       </div>
     </div>

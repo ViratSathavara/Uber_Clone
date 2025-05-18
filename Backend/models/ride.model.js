@@ -19,6 +19,12 @@ const rideSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    fullPickup: {
+        type: Object,
+    },
+    fullDestination: {
+        type: Object,
+    },
     fare: {
         type: Number,
         required: true

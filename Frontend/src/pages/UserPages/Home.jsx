@@ -10,12 +10,19 @@ import VehiclePanel from '../../CommonComponents/VehiclePanel';
 import ConfirmRide from '../../CommonComponents/ConfirmRide';
 import BackButton from '../../CommonComponents/BackButton';
 import { SocketProvider, useSocket } from '../../context/SocketContext';
+import { useCallback } from 'react';
+import { useNavigation } from '../../UtilityComponents/NavigateUtility';
+import LiveTracking from '../../CommonComponents/LiveTracking';
 
 const Home = () => {
+  const { navigateTo } = useNavigation();
   const { user } = useContext(UserDataContext);
   const [pickup, setPickup] = useState('');
+  const [fullPickup, setFullPickup] = useState('');
   const [destination, setDestination] = useState('');
+  const [fullDestination, setFullDestination] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
+  const token = localStorage.getItem('user_token')
   const [vehiclePanel, setVehiclePanel] = useState(false);
   const [confirmRide, setConfirmRide] = useState(false);
   const [activeField, setActiveField] = useState(null);
@@ -23,12 +30,12 @@ const Home = () => {
   const [vehicle, setVehicle] = useState({});
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [fare, setFare] = useState({});
-  const { sendMessage, receiveMessage } = useSocket();
-  console.log(user)
+  const { socket, sendMessage, receiveMessage } = useSocket();
+  const [driverData, setDriverData] = useState(null);
 
   useEffect(() => {
     sendMessage('join', {
-      userId: user._id,
+      userId: JSON.parse(user)._id,
       userType: 'user',
     })
   }, []);
@@ -40,26 +47,54 @@ const Home = () => {
     setPickup(value);
     setActiveField('pickup');
 
-    if (value.trim().length > 0) {
-      try {
-        const res = await axios.get(`http://localhost:4000/maps/get-suggestions`, {
-          params: { input: value },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('user_token')}`,
-          },
-        });
+    if (value.trim().length === 0) {
+      setPickupSuggestions([]);
+      return;
+    }
 
-        if (res.data && Array.isArray(res.data)) {
-          setPickupSuggestions(res.data);
-        } else {
-          console.error('Unexpected response format:', res.data);
-          setPickupSuggestions([]);
-        }
-      } catch (error) {
-        console.error('Error fetching pickup suggestions:', error);
+    try {
+      // Get token from localStorage
+      const token = localStorage.getItem('user_token');
+
+      // Check if token exists
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Verify token expiration (optional)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem('user_token');
+        throw new Error('Token has expired');
+      }
+
+      const res = await axios.get(`http://localhost:4000/maps/get-suggestions`, {
+        params: { input: value },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        timeout: 5000 // Add timeout to prevent hanging
+      });
+
+      if (res.data && Array.isArray(res.data)) {
+        setPickupSuggestions(res.data);
+      } else {
+        console.error('Unexpected response format:', res.data);
         setPickupSuggestions([]);
       }
-    } else {
+    } catch (error) {
+      console.error('Error fetching pickup suggestions:', error);
+
+      // Handle 401 specifically
+      if (error.response?.status === 401) {
+        // Remove invalid token
+        localStorage.removeItem('user_token');
+        // Optionally redirect to login or show login modal
+        // navigate('/login');
+        // Or show toast notification
+        // toast.error('Session expired. Please login again.');
+      }
+
       setPickupSuggestions([]);
     }
   };
@@ -74,7 +109,7 @@ const Home = () => {
         const res = await axios.get(`http://localhost:4000/maps/get-suggestions`, {
           params: { input: value },
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('user_token')}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         setDestinationSuggestions(res.data || []);
@@ -89,14 +124,16 @@ const Home = () => {
 
   const handleSelectSuggestion = (suggestion) => {
     if (activeField === 'pickup') {
-      setPickup(suggestion);
+      setPickup(suggestion.description);
+      setFullPickup(suggestion);
     } else {
-      setDestination(suggestion);
+      setDestination(suggestion.description);
+      setFullDestination(suggestion);
     }
   };
 
 
-  const createRide = async () => {
+  const createRide = useCallback(async () => {
     try {
       // Validate required fields
       if (!pickup || !destination) {
@@ -107,6 +144,8 @@ const Home = () => {
         {  // Request body
           pickup,
           destination,
+          fullPickup,
+          fullDestination,
           vehicleType: vehicle?.type
         },
         {  // Config
@@ -117,10 +156,8 @@ const Home = () => {
         }
       );
 
-      console.log(res)
 
       if (res.status === 201) {
-        // Update vehicle state with response data
         setVehicle(prev => ({ ...prev, ...res.data }));
 
       } else {
@@ -130,8 +167,26 @@ const Home = () => {
       console.error('Error creating ride:', error);
       throw error;  // Re-throw for handling in ConfirmRide component
     }
-  }
+  }, [vehicle]);
 
+  socket.on('ride-confirmed', (data) => {
+    console.log('data', data)
+    setDriverData(data?.ride);
+    setConfirmRide(true);
+    setVehiclePanel(false);
+    setPanelOpen(false);
+  });
+
+  socket.on('ride-started', (data) => {
+    console.log(data)
+
+    navigateTo('RIDING',data)
+  })
+
+  socket.on('ride-ended', (data) => {
+    console.log(data)
+    navigateTo('HOME')
+  })
   return (
     <div className='h-screen relative overflow-hidden'>
       <img
@@ -139,13 +194,8 @@ const Home = () => {
         alt="uber-logo"
         className="top-4 left-4 w-24 absolute"
       />
-      {/* Background / Logout */}
-      <div className='w-screen'>
-        <img
-          className='w-full h-screen object-cover'
-          src="https://cdn.dribbble.com/users/844221/screenshots/4539927/attachments/1027442/uber-search-2.png"
-          alt="image"
-        />
+      <div className='w-screen h-screen'>
+        <LiveTracking />
         <button
           onClick={() => {
             localStorage.removeItem('user_token');
@@ -248,6 +298,8 @@ const Home = () => {
         <ConfirmRide createRide={createRide} pickup={pickup}
           destination={destination}
           vehicleData={vehicle}
+          setDriverData={setDriverData}
+          driverData={driverData}
         />
       </div>
     </div>

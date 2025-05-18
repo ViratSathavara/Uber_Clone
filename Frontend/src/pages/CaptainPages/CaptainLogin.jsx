@@ -9,7 +9,6 @@ import AuthService from "../../services/AuthService";
 
 const CaptainLogin = () => {
   const [loginType, setLoginType] = useState("captain");
-  const [captionData, setCaptionData] = useState({});
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 

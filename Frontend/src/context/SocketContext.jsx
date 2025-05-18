@@ -40,7 +40,7 @@ export const SocketProvider = ({ children }) => {
 
     return (
         <SocketContext.Provider
-            value={{ sendMessage, receiveMessage }}
+            value={{ socket, sendMessage, receiveMessage }}
         >
             {children}
         </SocketContext.Provider>

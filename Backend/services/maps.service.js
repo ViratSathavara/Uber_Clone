@@ -1,4 +1,5 @@
 const axios = require("axios");
+const captainModel = require("../models/captain.model");
 
 module.exports.getAddressCoordinates = async(address) => {
     try {
@@ -8,7 +9,7 @@ module.exports.getAddressCoordinates = async(address) => {
         if (response.data.status === "OK") {
             const location = response.data.results[0].geometry.location;
             return {
-                lat: location.lat,
+                ltd: location.lat,
                 lng: location.lng,
             };
         } else {
@@ -62,4 +63,25 @@ module.exports.getAddressSuggestions = async(input) => {
         console.error("Error fetching address suggestions:", error.message);
         throw error;
     }
+}
+
+module.exports.getCaptainInTheRadius = async(ltd, lng, radius) => {
+
+    try {
+        const captains = await captainModel.find({
+            location: {
+                $geoWithin: {
+                    $centerSphere: [
+                        [ltd, lng], radius / 6371
+                    ]
+                }
+            }
+        });
+
+        return captains;
+    } catch (error) {
+        console.error("Error fetching captains in the radius:", error.message);
+        throw error;
+    }
+
 }

@@ -17,6 +17,7 @@
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
     "@mui/styled-engine-sc": "^7.0.2",
+    "@react-google-maps/api": "^2.20.6",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/vite": "^4.1.7",
     "autoprefixer": "^10.4.21",

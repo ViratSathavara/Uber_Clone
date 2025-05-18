@@ -24,4 +24,24 @@ router.get('/get-fare',
     rideController.getFare,
 )
 
+router.post('/confirm-ride',
+    authMiddleware.authCaptain,
+    body('rideId').isLength({ min: 1 }).withMessage('Ride ID is required'),
+    // body('otp').isLength({ min: 4, max: 4 }).withMessage('Invalid OTP'),
+    rideController.confirmRide,
+)
+
+router.post('/start-ride',
+    authMiddleware.authCaptain,
+    body('rideId').isLength({ min: 1 }).withMessage('Ride ID is required'),
+    body('otp').isLength({ min: 4, max: 4 }).withMessage('Invalid OTP'),
+    rideController.startRide
+);
+
+router.post('/end-ride',
+    authMiddleware.authCaptain,
+    body('rideId').isLength({ min: 1 }).withMessage('Ride ID is required'),
+    rideController.endRide
+);
+
 module.exports = router

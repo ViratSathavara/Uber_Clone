@@ -32,10 +32,9 @@ const Login = () => {
 
       if (response.status === 200) {
         showSuccessToast('User Login Successfully...');
-        const userData = response.data;
         const { token, user } = response.data.data;
         AuthService.setUserAuth(token, user);
-        setUser(user)
+        setUser(user);
         navigate('/home');
 
       }

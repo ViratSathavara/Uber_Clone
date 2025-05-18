@@ -10,28 +10,84 @@ import { Button } from '@mui/material';
 import RidePopup from './RidePopup';
 import BackButton from '../../CommonComponents/BackButton';
 import ConfirmRidePopup from './ConfirmRidePopup';
+import { SocketProvider, useSocket } from '../../context/SocketContext';
+import { useEffect } from 'react';
+import LiveTracking from '../../CommonComponents/LiveTracking';
 
 const CaptainHome = () => {
-    const { navigateTo } = useNavigation();
-    const [openPopup, setOpenPopup] = useState(true)
+    const [openPopup, setOpenPopup] = useState(false)
     const [confirmRidePopup, setConfirmRidePopup] = useState(false)
     const { captain } = React.useContext(CaptainDataContext);
     const navigate = useNavigate();
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('captain_token')
+    const { socket, sendMessage, receiveMessage } = useSocket();
+    const [ride, setRide] = useState(null);
+    const [confirmRideData, setConfirmRideData] = useState(null);
+    const [otp, setOtp] = useState('')
 
+
+    useEffect(() => {
+        sendMessage('join', {
+            captainId: JSON.parse(captain)._id,
+            userType: 'captain',
+        })
+
+        const updateLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+
+
+                    socket.emit('update-location-captain', {
+                        captainId: JSON.parse(captain)._id,
+                        location: {
+                            ltd: position.coords.latitude,
+                            lng: position.coords.longitude
+                        }
+                    })
+                })
+            }
+        }
+
+        const locationInterval = setInterval(() => { updateLocation() }, 5000)
+        return () => {
+            clearInterval(locationInterval);
+        }
+    }, []);
+
+    socket.on('new-ride', (data) => {
+        setRide(data);
+        setOpenPopup(true);
+    })
+
+    const confirmRide = async () => {
+        try {
+            const response = await axios.post('http://localhost:4000/ride/confirm-ride', {
+                rideId: ride._id,
+                captain: JSON.parse(captain),
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setConfirmRideData(response?.data);
+            console.log(response);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
 
     return (
         <div className="h-screen flex flex-col bg-gray-100">
-            <div className="h-1/2 relative">
-                <img
-                    className="w-full h-full object-cover" src="https://cdn.dribbble.com/users/844221/screenshots/4539927/attachments/1027442/uber-search-2.png?resize=400x300&vertical=center" alt="image" />
+            <div className="h-full relative">
+                <LiveTracking />
                 <button
                     onClick={() => {
-            localStorage.removeItem('captain_token')
-            localStorage.removeItem('captain_data')
-            window.location.href = '/login';
-          }
-          }
+                        localStorage.removeItem('captain_token')
+                        localStorage.removeItem('captain_data')
+                        window.location.href = '/login';
+                    }
+                    }
                     className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md"
                 >
                     <LogoutOutlinedIcon />
@@ -41,20 +97,20 @@ const CaptainHome = () => {
                 <CaptainDetails />
             </div>
             <div className={`p-3 flex flex-col gap-3 fixed left-0 w-full bg-white shadow-lg transition-all duration-[500ms] z-50 ${openPopup ? 'translate-y-0' : 'translate-y-full'} bottom-0`}>
-               <BackButton
-          onClick={() => {
-            setOpenPopup(false);
-          }}
-        />
-                <RidePopup setOpenPopup={setOpenPopup} setConfirmRidePopup={setConfirmRidePopup} />
+                <BackButton
+                    onClick={() => {
+                        setOpenPopup(false);
+                    }}
+                />
+                <RidePopup confirmRide={confirmRide} ride={ride} setOpenPopup={setOpenPopup} setConfirmRidePopup={setConfirmRidePopup} />
             </div>
             <div className={`p-3 flex flex-col h-screen gap-3 fixed left-0 w-full bg-white shadow-lg transition-all duration-[500ms] z-50 ${confirmRidePopup ? 'translate-y-0' : 'translate-y-full'} bottom-0`}>
-               <BackButton
-          onClick={() => {
-            setConfirmRidePopup(false);
-          }}
-        />
-                <ConfirmRidePopup setConfirmRidePopup={setConfirmRidePopup} setOpenPopup={setOpenPopup} />
+                <BackButton
+                    onClick={() => {
+                        setConfirmRidePopup(false);
+                    }}
+                />
+                <ConfirmRidePopup confirmRideData={confirmRideData} setConfirmRidePopup={setConfirmRidePopup} setOpenPopup={setOpenPopup} />
             </div>
 
         </div>

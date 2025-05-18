@@ -1,9 +1,9 @@
-const captionModel = require('../models/caption.model');
-const captionService = require('../services/caption.service')
+const captainModel = require('../models/captain.model');
+const captainService = require('../services/captain.service')
 const { validationResult } = require('express-validator');
 const blacklistTokenModel = require('../models/blacklistToken.model');
 
-module.exports.registerCaption = async(req, res) => {
+module.exports.registerCaptain = async(req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -12,16 +12,16 @@ module.exports.registerCaption = async(req, res) => {
 
     const { fullname, email, password, vehicle } = req.body;
 
-    const isCaptionAlreadyExist = await captionModel.findOne({ email });
+    const isCaptainAlreadyExist = await captainModel.findOne({ email });
 
-    if (isCaptionAlreadyExist) {
-        return res.status(400).json({ error: 'Caption already exists' });
+    if (isCaptainAlreadyExist) {
+        return res.status(400).json({ error: 'Captain already exists' });
     }
 
-    const hashPassword = await captionModel.hashPassword(password);
+    const hashPassword = await captainModel.hashPassword(password);
 
 
-    const captain = await captionService.createCaption({
+    const captain = await captainService.createCaptain({
         firstname: fullname.firstname,
         lastname: fullname.lastname,
         email,
@@ -38,24 +38,25 @@ module.exports.registerCaption = async(req, res) => {
 
 }
 
-module.exports.loginCaption = async(req, res) => {
+module.exports.loginCaptain = async(req, res) => {
     const errors = validationResult(req);
-
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
 
     const { email, password } = req.body;
 
-    const captain = await captionModel.findOne({ email }).select('+password');
+    const captain = await captainModel.findOne({ email }).select('+password');
 
-    if (!captain) {
-        return res.status(401).json({
-            success: false,
-            status: '401',
-            message: 'Invalid email address',
-        });
-    }
+
+    // if (!captain) {
+    //     return res.status(401).json({
+    //         success: false,
+    //         status: '401',
+    //         message: 'Invalid email address',
+    //     });
+    // }
+
 
     const isMatch = await captain.comparePassword(password, captain.password);
 
@@ -75,7 +76,7 @@ module.exports.loginCaption = async(req, res) => {
     res.status(200).json({
         success: true,
         status: '200',
-        message: 'Caption logged in successfully',
+        message: 'Captain logged in successfully',
         data: {
             captain,
             token,
@@ -83,11 +84,11 @@ module.exports.loginCaption = async(req, res) => {
     });
 }
 
-module.exports.getCaptionProfile = async(req, res, next) => {
+module.exports.getCaptainProfile = async(req, res, next) => {
     res.status(200).json(req.captain);
 }
 
-module.exports.logoutcaption = async(req, res, next) => {
+module.exports.logoutCaptain = async(req, res, next) => {
     res.clearCookie('token');
 
     // const token = req.cookies.token || req.headers['authorization'] ? .split(' ')[1];
@@ -99,6 +100,6 @@ module.exports.logoutcaption = async(req, res, next) => {
     res.status(200).json({
         success: true,
         status: '200',
-        message: 'Caption logged out successfully',
+        message: 'Captain logged out successfully',
     });
 }

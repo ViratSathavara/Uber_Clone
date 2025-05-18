@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import { Button } from '@mui/material';
@@ -6,19 +6,44 @@ import { useNavigate } from 'react-router-dom';
 import LookingForDriver from './LookingForDriver';
 import DriverProfile from './DriverProfile';
 
-const ConfirmRide = ({ vehicleData, createRide, pickup, destination }) => {
-  console.log(vehicleData)
+const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData, setDriverData }) => {
   const navigate = useNavigate();
   const [rideStatus, setRideStatus] = useState('confirm');
-  const [driverData, setDriverData] = useState(null);
+  const timeoutRef = useRef(null);
+  
+  // Watch for driverData changes
+  useEffect(() => {
+    if (driverData?._id) {
+      setRideStatus('driver_found');
+      clearTimeout(timeoutRef.current); // Clear the timeout if driver is found
+    }
+  }, [driverData]);
 
+  // Handle the ride confirmation and start searching
+  const handleConfirmRide = () => {
+    createRide();
+    setRideStatus('searching');
+    
+    // Set timeout for 2 minutes (120000 milliseconds)
+    timeoutRef.current = setTimeout(() => {
+      if (!driverData?._id) {
+        setRideStatus('not_found');
+      }
+    }, 120000); // 2 minutes = 120000 ms
+  };
+
+  // Clean up the timeout when component unmounts
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   // Render different screens based on ride status
   switch (rideStatus) {
     case 'searching':
       return (
-        <LookingForDriver 
-        />
+        <LookingForDriver />
       );
     
     case 'driver_found':
@@ -26,7 +51,11 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination }) => {
         <DriverProfile 
           driver={driverData}
           vehicle={vehicleData}
-          onCancel={() => setRideStatus('confirm')}
+          onCancel={() => {
+            setRideStatus('confirm');
+            setDriverData(null);
+            clearTimeout(timeoutRef.current);
+          }}
         />
       );
     
@@ -36,7 +65,10 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination }) => {
           <h1 className="text-2xl font-bold mb-4">Driver Not Found</h1>
           <p className="text-gray-600 mb-6">Sorry, we couldn't find a driver for your ride.</p>
           <Button 
-            onClick={() => setRideStatus('confirm')}
+            onClick={() => {
+              setRideStatus('confirm');
+              clearTimeout(timeoutRef.current);
+            }}
             className="!bg-blue-600 !text-white"
           >
             Try Again
@@ -69,7 +101,7 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination }) => {
                 <AddLocationIcon className="text-black text-3" />
                 <h1 className="text-sm font-medium text-gray-500">Pickup Location</h1>
               </div>
-              <h2 className="text-lg font-semibold mt-1">{pickup}</h2>
+              <h2 className="text-lg font-semibold mt-1">{pickup?.suggestion}</h2>
             </div>
 
             {/* Destination Location */}
@@ -78,7 +110,7 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination }) => {
                 <WhereToVoteIcon className="text-black text-3" />
                 <h1 className="text-sm font-medium text-gray-500">Destination Location</h1>
               </div>
-              <h2 className="text-lg font-semibold mt-1">{destination}</h2>
+              <h2 className="text-lg font-semibold mt-1">{destination?.suggestion}</h2>
             </div>
 
             {/* Price */}
@@ -88,11 +120,7 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination }) => {
             </div>
 
             <Button
-              onClick={() => {
-                createRide()
-                setRideStatus('searching');
-              }
-              }
+              onClick={handleConfirmRide}
               className="w-full py-3 !bg-green-600 !text-white font-bold rounded-lg hover:!bg-green-700 transition"
             >
               Confirm Ride

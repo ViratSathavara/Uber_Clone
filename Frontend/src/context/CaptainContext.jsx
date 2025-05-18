@@ -4,20 +4,7 @@ export const CaptainDataContext = createContext();
 
 const CaptainContext = ({children}) => {
 
-  const [captain, setCaptain] = useState({
-    fullname: {
-        firstname: '',
-        lastname: ''
-      },
-      email: '',
-      password: '', 
-      vehicle: {
-        color: '',
-        plate: '',
-        capacity: '',
-        vehicleType: ''
-      }
-  })
+  const [captain, setCaptain] = useState(localStorage.getItem('captain_data') || {})
   
   return (
     <div>

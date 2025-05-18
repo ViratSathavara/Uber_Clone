@@ -3,8 +3,10 @@ import AddLocationIcon from '@mui/icons-material/AddLocation';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import { Button } from '@mui/material';
 import { useNavigation } from '../../UtilityComponents/NavigateUtility';
+import axios from 'axios';
 
-const ConfirmRidePopup = ({ setConfirmRidePopup, setOpenPopup }) => {
+const ConfirmRidePopup = ({ confirmRideData, setConfirmRidePopup, setOpenPopup }) => {
+    console.log('confirmRideData', confirmRideData)
     const { navigateTo } = useNavigation();
     const [otp, setOtp] = useState(['', '', '', '']);
     const inputRefs = useRef([]);
@@ -26,16 +28,42 @@ const ConfirmRidePopup = ({ setConfirmRidePopup, setOpenPopup }) => {
         }
     };
 
-    const handleVerify = () => {
-        const enteredOtp = otp.join('');
-        if (enteredOtp.length === 4) {
-            console.log('OTP entered:', enteredOtp);
+const handleVerify = async () => {
+  try {
+    const enteredOtp = otp.join('');
+    if (enteredOtp.length !== 4) {
+      alert('Please enter the complete 4-digit OTP');
+      return;
+    }
 
-            navigateTo('CAPTAIN_RIDING');
-        } else {
-            alert('Please enter the complete 4-digit OTP');
+    console.log('confirmRideData:', confirmRideData._id, enteredOtp);
+
+    // Change to POST request and send data in body
+    const response = await axios.post(
+      'http://localhost:4000/ride/start-ride',
+      {
+        rideId: confirmRideData._id,
+        otp: enteredOtp
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('captain_token')}`,
+          'Content-Type': 'application/json'
         }
-    };
+      }
+    );
+    if (response.status === 200) {
+      navigateTo('CAPTAIN_RIDING', response?.data );
+    }
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    if (error.response) {
+      alert(error.response.data.message || 'Failed to start ride');
+    } else {
+      alert('Network error. Please try again.');
+    }
+  }
+};
 
     return (
         <div>
@@ -48,7 +76,7 @@ const ConfirmRidePopup = ({ setConfirmRidePopup, setOpenPopup }) => {
                         className="w-16 h-16 rounded-full object-cover border-2 border-blue-500"
                     />
                     <div className='flex items-end flex-col'>
-                        <h2 className='text-2xl font-bold'>Maria Oka</h2>
+                        <h2 className='text-2xl font-bold'>{confirmRideData?.user?.fullname?.firstname + " " + confirmRideData?.user?.fullname?.lastname}</h2>
                         <p>2.4 km</p>
                     </div>
                 </div>
@@ -57,8 +85,8 @@ const ConfirmRidePopup = ({ setConfirmRidePopup, setOpenPopup }) => {
                         <AddLocationIcon className="text-black text-3" />
                         <h1 className="text-sm font-medium text-gray-500">Pickup Location</h1>
                     </div>
-                    <h2 className="text-lg font-semibold mt-1">Padmavati Parking</h2>
-                    <h3 className="text-gray-600">Near Padmavati Temple, Satara Road, Pune</h3>
+                    <h3 className="text-black">{confirmRideData?.fullPickup?.structured_formatting?.main_text}</h3>
+                    <p className="text-gray-600">{confirmRideData?.pickup}</p>
                 </div>
 
                 <div className="p-4 border-b border-gray-200">
@@ -66,18 +94,18 @@ const ConfirmRidePopup = ({ setConfirmRidePopup, setOpenPopup }) => {
                         <WhereToVoteIcon className="text-black text-3" />
                         <h1 className="text-sm font-medium text-gray-500">Destination Location</h1>
                     </div>
-                    <h2 className="text-lg font-semibold mt-1">20 Tathastu Homes</h2>
-                    <h3 className="text-gray-600">bankar colony, hadapsar, Hydrabad road, Pune</h3>
+                    <h3 className="text-black">{confirmRideData?.fullDestination?.structured_formatting?.main_text}</h3>
+                    <p className="text-gray-600">{confirmRideData?.destination}</p>
                 </div>
 
                 {/* Price */}
                 <div className="flex justify-between items-center p-4 rounded-lg">
                     <h1 className="text-lg font-medium">Price</h1>
-                    <h2 className="text-lg font-semibold">₹250.29 Cash</h2>
+                    <h2 className="text-lg font-semibold">₹{confirmRideData?.fare}</h2>
                 </div>
 
                 <div className='flex flex-col gap-3'>
-                    <form className="flex flex-col gap-3">
+                    <form className="flex flex-col gap-3" onSubmit={handleVerify}>
                         <h1 className="text-lg font-medium">Enter OTP Here</h1>
                         <div className="flex items-center justify-between w-full">
                             {[0, 1, 2, 3].map((index) => (
@@ -94,37 +122,22 @@ const ConfirmRidePopup = ({ setConfirmRidePopup, setOpenPopup }) => {
                                 />
                             ))}
                         </div>
-                        <Button
-                            onClick={() => {
-                                setConfirmRidePopup(false);
-                                setOpenPopup(false);
-                            }}
-                            className="!capitalize w-full py-3 !bg-gray-200 !text-gray-800 font-bold rounded-lg hover:!bg-green-700"
-                        >
-                            Verify OTP
-                        </Button>
+                        <div className='flex flex-row gap-3'>
+                            <Button
+                                type='submit'
+                                className="!capitalize w-full py-3 !bg-gray-200 !text-gray-800 font-bold rounded-lg hover:!bg-green-700"
+                            >
+                                Ignore
+                            </Button>
+                            <Button
+                                onClick={handleVerify}
+                                className="!capitalize w-full py-3 !bg-green-400 !text-black font-bold rounded-lg hover:!bg-green-700 transition"
+                            >
+                                Confirm
+                            </Button>
+                        </div>
                     </form>
 
-                    <div className='flex flex-row gap-3'>
-                        <Button
-                            onClick={() => {
-                                setConfirmRidePopup(false);
-                                setOpenPopup(false);
-                            }}
-                            className="!capitalize w-full py-3 !bg-gray-200 !text-gray-800 font-bold rounded-lg hover:!bg-green-700"
-                        >
-                            Ignore
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                navigateTo('CAPTAIN_RIDING');
-                            }
-                            }
-                            className="!capitalize w-full py-3 !bg-green-400 !text-black font-bold rounded-lg hover:!bg-green-700 transition"
-                        >
-                            Confirm
-                        </Button>
-                    </div>
                 </div>
             </div>
         </div>

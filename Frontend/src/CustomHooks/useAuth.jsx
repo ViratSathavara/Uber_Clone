@@ -6,9 +6,7 @@ export const useUserAuth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('isUserAuthenticated', AuthService.isUserAuthenticated())
     if (AuthService.isUserAuthenticated()) {
-        console.log('first')
       navigate('/home');
     } else if (AuthService.isCaptainAuthenticated()) {
       navigate('/captain-home');

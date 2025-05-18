@@ -23,7 +23,6 @@ const CaptainDetails = () => {
         carColor: "White"
     };
 
-    console.log(captain)
     return (
         <>
             <div className='flex flex-col gap-1 p-4 mt-3 rounded-lg items-center'>

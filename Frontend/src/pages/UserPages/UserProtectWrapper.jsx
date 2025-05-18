@@ -5,7 +5,6 @@ const UserProtectWrapper = ({children}) => {
 
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
-  console.log('token', token);
   useEffect(() => {
 
     if (!token) {

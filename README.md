@@ -169,26 +169,26 @@ Headers:
 
 ---
 
-### POST /caption/register
+### POST /captain/register
 
 **Description:**  
-This endpoint is used to register a new caption (driver) along with their vehicle details.
+This endpoint is used to register a new captain (driver) along with their vehicle details.
 
 **Request Body:**  
 The following fields are required in the request body:
-- `fullname.firstname` (string, minimum 3 characters) - The first name of the caption.
-- `fullname.lastname` (string, minimum 3 characters) - The last name of the caption.
-- `email` (string, valid email format) - The email address of the caption.
-- `password` (string, minimum 6 characters) - The password for the caption account.
+- `fullname.firstname` (string, minimum 3 characters) - The first name of the captain.
+- `fullname.lastname` (string, minimum 3 characters) - The last name of the captain.
+- `email` (string, valid email format) - The email address of the captain.
+- `password` (string, minimum 6 characters) - The password for the captain account.
 - `vehicle.color` (string, minimum 3 characters) - The color of the vehicle.
 - `vehicle.plate` (string, minimum 3 characters) - The license plate of the vehicle.
 - `vehicle.capacity` (integer, minimum 1) - The seating capacity of the vehicle.
 - `vehicle.vehicleType` (string, one of `car`, `auto`, `bike`) - The type of the vehicle.
 
 **Response Status Codes:**
-- `201 Created` - Caption registered successfully. Returns the caption object and an authentication token.
-- `400 Bad Request` - Validation errors in the request body or caption already exists. Returns an array of error messages.
-- `500 Internal Server Error` - Server error during caption registration.
+- `201 Created` - Captain registered successfully. Returns the captain object and an authentication token.
+- `400 Bad Request` - Validation errors in the request body or captain already exists. Returns an array of error messages.
+- `500 Internal Server Error` - Server error during captain registration.
 
 **Example Request:**
 ```json
@@ -212,7 +212,7 @@ The following fields are required in the request body:
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "caption": {
+  "captain": {
     "_id": "64f1c2e9b5d6c9a1e2f3g4h5",
     "fullname": {
       "firstname": "Jane",
@@ -232,21 +232,21 @@ The following fields are required in the request body:
 
 ---
 
-### POST /caption/login
+### POST /captain/login
 
 **Description:**  
-This endpoint is used to log in an existing caption (driver).
+This endpoint is used to log in an existing captain (driver).
 
 **Request Body:**  
 The following fields are required in the request body:
-- `email` (string, valid email format) - The email address of the caption.
-- `password` (string, minimum 6 characters) - The password for the caption account.
+- `email` (string, valid email format) - The email address of the captain.
+- `password` (string, minimum 6 characters) - The password for the captain account.
 
 **Response Status Codes:**
-- `200 OK` - Caption logged in successfully. Returns the caption object and an authentication token.
+- `200 OK` - Captain logged in successfully. Returns the captain object and an authentication token.
 - `401 Unauthorized` - Invalid email or password.
 - `422 Unprocessable Entity` - Validation errors in the request body. Returns an array of error messages.
-- `500 Internal Server Error` - Server error during caption login.
+- `500 Internal Server Error` - Server error during captain login.
 
 **Example Request:**
 ```json
@@ -261,9 +261,9 @@ The following fields are required in the request body:
 {
   "success": true,
   "status": "200",
-  "message": "Caption logged in successfully",
+  "message": "Captain logged in successfully",
   "data": {
-    "caption": {
+    "captain": {
       "_id": "64f1c2e9b5d6c9a1e2f3g4h5",
       "fullname": {
         "firstname": "Jane",
@@ -285,17 +285,17 @@ The following fields are required in the request body:
 
 ---
 
-### GET /caption/profile
+### GET /captain/profile
 
 **Description:**  
-This endpoint is used to retrieve the profile of the currently authenticated caption (driver).
+This endpoint is used to retrieve the profile of the currently authenticated captain (driver).
 
 **Request Headers:**  
-- `Authorization` (string, required) - Bearer token for caption authentication.
+- `Authorization` (string, required) - Bearer token for captain authentication.
 
 **Response Status Codes:**
-- `200 OK` - Caption profile retrieved successfully. Returns the caption object.
-- `401 Unauthorized` - Caption is not authenticated or token is invalid.
+- `200 OK` - Captain profile retrieved successfully. Returns the captain object.
+- `401 Unauthorized` - Captain is not authenticated or token is invalid.
 - `500 Internal Server Error` - Server error during profile retrieval.
 
 **Example Request:**  
@@ -328,21 +328,21 @@ Headers:
 
 ---
 
-### GET /caption/logout
+### GET /captain/logout
 
 **Description:**  
-This endpoint is used to log out the currently authenticated caption (driver). The JWT token used for authentication is blacklisted, ensuring it cannot be reused.
+This endpoint is used to log out the currently authenticated captain (driver). The JWT token used for authentication is blacklisted, ensuring it cannot be reused.
 
 **Request Headers:**  
-- `Authorization` (string, required) - Bearer token for caption authentication.
+- `Authorization` (string, required) - Bearer token for captain authentication.
 
 **Response Status Codes:**
-- `200 OK` - Caption logged out successfully.
-- `401 Unauthorized` - Caption is not authenticated or token is invalid.
+- `200 OK` - Captain logged out successfully.
+- `401 Unauthorized` - Captain is not authenticated or token is invalid.
 - `500 Internal Server Error` - Server error during logout.
 
 **Blacklist Functionality:**  
-When a caption logs out, their JWT token is added to a blacklist stored in the database. The token is set to expire automatically after 24 hours (TTL). During authentication, any token found in the blacklist is considered invalid, preventing unauthorized reuse of tokens.
+When a captain logs out, their JWT token is added to a blacklist stored in the database. The token is set to expire automatically after 24 hours (TTL). During authentication, any token found in the blacklist is considered invalid, preventing unauthorized reuse of tokens.
 
 **Example Request:**  
 Headers:
@@ -357,7 +357,7 @@ Headers:
 {
   "success": true,
   "status": "200",
-  "message": "Caption logged out successfully"
+  "message": "Captain logged out successfully"
 }
 ```
 
@@ -1343,7 +1343,7 @@ A 4-digit OTP is automatically generated for the ride, which must be verified wh
 
 ViratSathavara: add this data in readme.md file 
 
-GitHub Copilot: Here's the content to add to your README.md file after the caption logout endpoint documentation:
+GitHub Copilot: Here's the content to add to your README.md file after the captain logout endpoint documentation:
 
 ```markdown
 ---

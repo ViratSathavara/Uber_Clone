@@ -3,7 +3,8 @@ import React from 'react'
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 
-const RidePopup = ({ setOpenPopup, setConfirmRidePopup }) => {
+const RidePopup = ({ confirmRide={confirmRide}, ride, setOpenPopup, setConfirmRidePopup }) => {
+    console.log('ride', ride);
     return (
         <div>
             <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md">
@@ -15,7 +16,7 @@ const RidePopup = ({ setOpenPopup, setConfirmRidePopup }) => {
                         className="w-16 h-16 rounded-full object-cover border-2 border-blue-500"
                     />
                     <div className='flex items-end flex-col'>
-                        <h2 className='text-2xl font-bold'>Maria Oka</h2>
+                        <h2 className='text-2xl font-bold'>{ride?.user?.fullname?.firstname + " " + ride?.user?.fullname?.firstname}</h2>
                         <p>2.4 km</p>
                     </div>
                 </div>
@@ -24,8 +25,8 @@ const RidePopup = ({ setOpenPopup, setConfirmRidePopup }) => {
                         <AddLocationIcon className="text-black text-3" />
                         <h1 className="text-sm font-medium text-gray-500">Pickup Location</h1>
                     </div>
-                    <h2 className="text-lg font-semibold mt-1">Padmavati Parking</h2>
-                    <h3 className="text-gray-600">Near Padmavati Temple, Satara Road, Pune</h3>
+                    <h3 className="text-black">{ride?.fullPickup?.structured_formatting?.main_text}</h3>
+                    <p className="text-gray-600">{ride?.pickup}</p>
                 </div>
 
                 <div className="p-4 border-b border-gray-200">
@@ -33,18 +34,19 @@ const RidePopup = ({ setOpenPopup, setConfirmRidePopup }) => {
                         <WhereToVoteIcon className="text-black text-3" />
                         <h1 className="text-sm font-medium text-gray-500">Destination Location</h1>
                     </div>
-                    <h2 className="text-lg font-semibold mt-1">20 Tathastu Homes</h2>
-                    <h3 className="text-gray-600">bankar colony, hadapsar, Hydrabad road, Pune</h3>
+                    <h3 className="text-gray-600">{ride?.fullDestination?.structured_formatting?.main_text}</h3>
+                    <p className="text-gray-600">{ride?.destination}</p>
                 </div>
 
                 {/* Price */}
                 <div className="flex justify-between items-center p-4 rounded-lg">
                     <h1 className="text-lg font-medium">Price</h1>
-                    <h2 className="text-lg font-semibold">₹250.29 Cash</h2>
+                    <h2 className="text-lg font-semibold">₹{ride?.fare}</h2>
                 </div>
                 <div className='flex flex-row gap-3'>
                     <Button
                           onClick={() => {
+                            confirmRide()
                             setConfirmRidePopup(true)}}
                         className="!capitalize w-full py-3 !bg-yellow-400 !text-black font-bold rounded-lg hover:!bg-green-700 transition"
                     >

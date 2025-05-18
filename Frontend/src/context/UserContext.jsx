@@ -4,14 +4,7 @@ export const UserDataContext = createContext();
 
 const UserContext = ({children}) => {
 
-  const [user, setUser] = useState({
-    fullname: {
-        firstname: '',
-        lastname: ''
-      },
-      email: '',
-      password: ''
-  })
+  const [user, setUser] = useState(JSON.parse(JSON.stringify(localStorage.getItem('user_data'))) || {})
   
   return (
     <div>

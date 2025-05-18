@@ -42,7 +42,7 @@ const LocationSearchPanel = ({ pickup, destination, setPanelOpen, setVehiclePane
                     {safeSuggestions.map((suggestion, index) => (
                         <div
                             key={index}
-                            onClick={() => onSelectSuggestion(suggestion.description || '')}
+                            onClick={() => onSelectSuggestion(suggestion || '')}
                             className="flex items-center gap-4 border-1 border-gray-400 rounded-lg m-3 p-1 py-3 overflow-auto cursor-pointer"
                         >
                             <LocationPinIcon />

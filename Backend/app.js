@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 const connectDB = require('./db/db');
 const userRoutes = require('./routes/user.route');
-const captionRoutes = require('./routes/caption.routes');
+const captainRoutes = require('./routes/captain.routes');
 const cookieParser = require('cookie-parser');
 const mapsRoutes = require('./routes/maps.routes');
 const rideRoutes = require('./routes/rides.routes');
@@ -13,7 +13,7 @@ const rideRoutes = require('./routes/rides.routes');
 connectDB();
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: '*',
     credentials: true
 }));
 
@@ -28,6 +28,6 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', userRoutes);
-app.use('/captain', captionRoutes);
+app.use('/captain', captainRoutes);
 
 module.exports = app;
