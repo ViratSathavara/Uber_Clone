@@ -14,6 +14,8 @@ const UserRiding = () => {
     const location = useLocation();
     const data = location.state.data.ride; 
 
+    console.log('data', data);
+
 
   // Mock trip data
   const trip = {

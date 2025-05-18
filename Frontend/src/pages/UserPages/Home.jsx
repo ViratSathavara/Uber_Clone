@@ -170,7 +170,6 @@ const Home = () => {
   }, [vehicle]);
 
   socket.on('ride-confirmed', (data) => {
-    console.log('data', data)
     setDriverData(data?.ride);
     setConfirmRide(true);
     setVehiclePanel(false);
@@ -178,9 +177,8 @@ const Home = () => {
   });
 
   socket.on('ride-started', (data) => {
-    console.log(data)
 
-    navigateTo('RIDING',data)
+    navigateTo('RIDING', { state: { data } })
   })
 
   socket.on('ride-ended', (data) => {
