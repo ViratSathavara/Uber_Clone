@@ -1,13 +1,16 @@
-const http = require("http");
-const app = require("./app");
-const { initializeSocket } = require("./socket");
+const http = require('http');
+const app = require('./app');
+const { initializeSocket } = require('./socket');
 
-const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT || 10000, () => {
-    console.log(`Server running on port ${process.env.PORT}`);
-});
+const PORT = process.env.PORT || 3000; // Use Render's default port or 10000
 
-// attach Socket.IO
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.IO
 initializeSocket(server);
 
-server.listen();
+// Start server
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

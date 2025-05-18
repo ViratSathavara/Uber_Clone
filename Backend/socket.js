@@ -7,8 +7,11 @@ let ioInstance;
 function initializeSocket(server) {
     ioInstance = SocketIo(server, {
         cors: {
-            origin: "*",
+            origin: ['https://uber-clone-6qea.onrender.com',
+                'http://localhost:5173'
+            ],
             methodas: ["GET", "POST"],
+            credentials: true,
         }
     });
 
