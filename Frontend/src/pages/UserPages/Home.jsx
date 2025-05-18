@@ -178,7 +178,7 @@ const Home = () => {
 
   socket.on('ride-started', (data) => {
 
-    navigateTo('RIDING', { state: { data } })
+    navigateTo('RIDING', data )
   })
 
   socket.on('ride-ended', (data) => {

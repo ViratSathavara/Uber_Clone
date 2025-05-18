@@ -12,7 +12,7 @@ import { useLocation } from 'react-router-dom';
 const UserRiding = () => {
     const { navigateTo } = useNavigation();
     const location = useLocation();
-    const data = location.state.data.ride; 
+    const data = location.state || {};; 
 
     console.log('data', data);
 
