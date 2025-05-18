@@ -13,7 +13,7 @@ const rideRoutes = require('./routes/rides.routes');
 connectDB();
 
 app.use(cors({
-    origin: '*',
+    origin: [process.env.FRONTEND_HOSTED_URL],
     credentials: true
 }));
 
