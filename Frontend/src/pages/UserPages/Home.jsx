@@ -28,6 +28,7 @@ const Home = () => {
   const [activeField, setActiveField] = useState(null);
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [vehicle, setVehicle] = useState({});
+  console.log(vehicle)
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [fare, setFare] = useState({});
   const { socket, sendMessage, receiveMessage } = useSocket();
@@ -182,7 +183,7 @@ const Home = () => {
         alt="uber-logo"
         className="top-4 left-4 w-24 absolute"
       />
-      <div className='w-screen h-screen'>
+      <div className='w-screen h-full'>
         <LiveTracking />
         <button
           onClick={() => {
@@ -197,16 +198,23 @@ const Home = () => {
       </div>
 
       <div className='absolute flex flex-col justify-end h-auto bottom-0 w-full'>
-        <div className='p-5 bg-white'>
+        <div className={`p-5 max-h-screen  relative bg-white`}>
           <div className='flex justify-between'>
             <h1 className='text-2xl font-bold text-black'>Welcome to Uber</h1>
-            {panelOpen && (
               <Button onClick={() => setPanelOpen(false)}>
                 <KeyboardArrowDownIcon className='text-black' />
               </Button>
-            )}
           </div>
-          <div className='flex flex-col gap-4 mt-5 relative'>
+          <div className='absolute right-2 text-blue-500'>
+            <Button className='!capitalize' onClick={
+              () => {
+                setPickup('');
+                setDestination('');
+                setPanelOpen(false);
+              }
+            }>clear</Button>
+          </div>
+          <div className='flex flex-col gap-4 mt-8 relative'>
             <div className='absolute w-1 h-20 bg-gray-700 z-10 left-4.5 top-6.5'></div>
             <TextField
               onClick={() => {
@@ -215,7 +223,6 @@ const Home = () => {
               }}
               value={pickup}
               onChange={handlePickupChange}
-              // onKeyDown={handleKeyDown} // Add keydown handler
               placeholder="Add a pick-up location"
               variant="outlined"
               fullWidth
@@ -231,7 +238,6 @@ const Home = () => {
               }}
               value={destination}
               onChange={handleDestinationChange}
-              // onKeyDown={handleKeyDown} // Add keydown handler
               placeholder="Enter your destination"
               variant="outlined"
               fullWidth
@@ -241,7 +247,7 @@ const Home = () => {
               }}
             />
           </div>
-        </div>
+        
 
         <div
           className={`transition-all duration-700 ease-in-out overflow-hidden ${panelOpen ? 'max-h-[70vh]' : 'max-h-0'
@@ -257,6 +263,7 @@ const Home = () => {
             pickup={pickup}
             destination={destination}
           />
+        </div>
         </div>
       </div>
 
@@ -274,20 +281,19 @@ const Home = () => {
       </div>
 
       <div
-        className={`p-3 flex flex-col gap-3 fixed left-0 w-full bg-white shadow-lg transition-all duration-[1000ms] z-50 ${confirmRide ? 'translate-y-0' : 'translate-y-full'
+        className={`p-3 flex flex-col gap-3 max-h-screen overflow-scroll fixed left-0 w-full bg-white shadow-lg  z-50 ${confirmRide ? 'translate-y-0' : 'translate-y-full'
           } bottom-0`}
       >
-        <BackButton
-          onClick={() => {
-            setVehiclePanel(true);
-            setConfirmRide(false);
-          }}
-        />
-        <ConfirmRide createRide={createRide} pickup={pickup}
-          destination={destination}
+        
+        <ConfirmRide createRide={createRide}
+        setVehiclePanel={setVehiclePanel}
+        setVehicle={setVehicle}
+          setConfirmRide={setConfirmRide}
           vehicleData={vehicle}
           setDriverData={setDriverData}
           driverData={driverData}
+          fullDestination={fullDestination}
+          fullPickup={fullPickup}
         />
       </div>
     </div>

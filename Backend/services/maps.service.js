@@ -23,21 +23,30 @@ module.exports.getAddressCoordinates = async(address) => {
 
 module.exports.getDistanceTime = async(origin, destination) => {
     if (!origin || !destination) {
-        throw new Error("Origin and destination are required");
+        throw {
+            status: 400,
+            message: "Origin and destination are required"
+        };
     }
     try {
         const apiKey = process.env.GOOGLE_MAPS_API_KEY;
         const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=${apiKey}`;
         const response = await axios.get(url);
         if (response.data.status === "OK") {
-
             if (response.data.rows[0].elements[0].status !== "OK") {
-                throw new Error("Unable to get distance and duration");
+                throw {
+                    status: 404,
+                    message: "Could not calculate route between these locations",
+                    details: response.data.rows[0].elements[0].status
+                };
             }
-
             return response.data.rows[0].elements[0];
         } else {
-            throw new Error("Unable to get distance and duration");
+            throw {
+                status: 502,
+                message: "Google Maps API error",
+                details: response.data.status
+            };
         }
     } catch (error) {
         console.error("Error fetching distance and duration:", error.message);

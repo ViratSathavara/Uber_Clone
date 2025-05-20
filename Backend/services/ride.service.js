@@ -12,19 +12,22 @@ async function getFare(pickup, destination) {
 
     const baseFares = {
         auto: 30,
-        car: 50,
+        UberGo: 50,
+        UberXL: 80, // New base fare for UberXL
         bike: 20
     };
 
     const perKmRates = {
         auto: 10,
-        car: 15,
+        UberGo: 15,
+        UberXL: 20, // New per km rate for UberXL
         bike: 8
     };
 
     const perMinuteRates = {
         auto: 2,
-        car: 3,
+        UberGo: 3,
+        UberXL: 4, // New per minute rate for UberXL
         bike: 1.5
     };
 
@@ -34,10 +37,15 @@ async function getFare(pickup, destination) {
             (distanceTime.distance.value / 1000) * perKmRates.auto +
             (distanceTime.duration.value / 60) * perMinuteRates.auto
         ),
-        car: Math.round(
-            baseFares.car +
-            (distanceTime.distance.value / 1000) * perKmRates.car +
-            (distanceTime.duration.value / 60) * perMinuteRates.car
+        UberGo: Math.round(
+            baseFares.UberGo +
+            (distanceTime.distance.value / 1000) * perKmRates.UberGo +
+            (distanceTime.duration.value / 60) * perMinuteRates.UberGo
+        ),
+        UberXL: Math.round(
+            baseFares.UberXL +
+            (distanceTime.distance.value / 1000) * perKmRates.UberXL +
+            (distanceTime.duration.value / 60) * perMinuteRates.UberXL
         ),
         bike: Math.round(
             baseFares.bike +
@@ -45,7 +53,6 @@ async function getFare(pickup, destination) {
             (distanceTime.duration.value / 60) * perMinuteRates.bike
         )
     };
-
 
     return fare;
 }

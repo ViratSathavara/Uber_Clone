@@ -41,7 +41,7 @@ const LiveTracking = () => {
     }, [updatePosition]);
 
     return (
-        <div>
+        <div className="w-full h-full">
             <LoadScript googleMapsApiKey="AIzaSyDgtD1Kp8yUQ_9-qqss2QUFRDX2RjH6ywI">
                 {position && (
                     <GoogleMap
