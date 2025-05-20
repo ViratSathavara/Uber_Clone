@@ -28,7 +28,7 @@ const CaptainHome = () => {
 
     useEffect(() => {
         sendMessage('join', {
-            captainId: JSON.parse(captain)._id,
+            captainId: captain._id,
             userType: 'captain',
         })
 
@@ -38,7 +38,7 @@ const CaptainHome = () => {
 
 
                     socket.emit('update-location-captain', {
-                        captainId: JSON.parse(captain)._id,
+                        captainId: captain._id,
                         location: {
                             ltd: position.coords.latitude,
                             lng: position.coords.longitude
@@ -63,7 +63,7 @@ const CaptainHome = () => {
         try {
             const response = await axios.post(`${import.meta.env.VITE_BASE_HOSTED_URI}/ride/confirm-ride`, {
                 rideId: ride._id,
-                captain: JSON.parse(captain),
+                captain: captain,
             }, {
                 headers: {
                     'Authorization': `Bearer ${token}`

@@ -2,6 +2,7 @@ const captainModel = require('../models/captain.model');
 const captainService = require('../services/captain.service')
 const { validationResult } = require('express-validator');
 const blacklistTokenModel = require('../models/blacklistToken.model');
+const userModel = require('../models/user.model');
 
 module.exports.registerCaptain = async(req, res) => {
 
@@ -10,12 +11,18 @@ module.exports.registerCaptain = async(req, res) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullname, email, password, vehicle } = req.body;
+    const { fullname, mobile, email, password, vehicle } = req.body;
 
     const isCaptainAlreadyExist = await captainModel.findOne({ email });
+    const isCaptainAlreadyExistByPhone = await captainModel.findOne({ mobile });
+    const isUserAlreadyExist = await userModel.findOne({ email });
+    const isUserAlreadyExistByPhone = await userModel.findOne({ mobile });
 
-    if (isCaptainAlreadyExist) {
+    if (isCaptainAlreadyExist || isCaptainAlreadyExistByPhone) {
         return res.status(400).json({ error: 'Captain already exists' });
+    }
+    if (isUserAlreadyExist || isUserAlreadyExistByPhone) {
+        return res.status(400).json({ error: 'User already exists' });
     }
 
     const hashPassword = await captainModel.hashPassword(password);
@@ -24,6 +31,7 @@ module.exports.registerCaptain = async(req, res) => {
     const captain = await captainService.createCaptain({
         firstname: fullname.firstname,
         lastname: fullname.lastname,
+        mobile,
         email,
         password: hashPassword,
         color: vehicle.color,
@@ -49,13 +57,13 @@ module.exports.loginCaptain = async(req, res) => {
     const captain = await captainModel.findOne({ email }).select('+password');
 
 
-    // if (!captain) {
-    //     return res.status(401).json({
-    //         success: false,
-    //         status: '401',
-    //         message: 'Invalid email address',
-    //     });
-    // }
+    if (!captain) {
+        return res.status(401).json({
+            success: false,
+            status: '401',
+            message: 'Invalid email address',
+        });
+    }
 
 
     const isMatch = await captain.comparePassword(password, captain.password);

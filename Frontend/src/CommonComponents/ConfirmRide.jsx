@@ -11,35 +11,30 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData,
   const [rideStatus, setRideStatus] = useState('confirm');
   const timeoutRef = useRef(null);
   
-  // Watch for driverData changes
   useEffect(() => {
     if (driverData?._id) {
       setRideStatus('driver_found');
-      clearTimeout(timeoutRef.current); // Clear the timeout if driver is found
+      clearTimeout(timeoutRef.current);
     }
   }, [driverData]);
 
-  // Handle the ride confirmation and start searching
   const handleConfirmRide = () => {
     createRide();
     setRideStatus('searching');
     
-    // Set timeout for 2 minutes (120000 milliseconds)
     timeoutRef.current = setTimeout(() => {
       if (!driverData?._id) {
         setRideStatus('not_found');
       }
-    }, 120000); // 2 minutes = 120000 ms
+    }, 120000);
   };
 
-  // Clean up the timeout when component unmounts
   useEffect(() => {
     return () => {
       clearTimeout(timeoutRef.current);
     };
   }, []);
 
-  // Render different screens based on ride status
   switch (rideStatus) {
     case 'searching':
       return (
@@ -76,13 +71,12 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData,
         </div>
       );
     
-    default: // 'confirm'
+    default:
       return (
         <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md">
           <h1 className="text-2xl font-bold text-center mb-6">Confirm Your Ride</h1>
 
           <div className="space-y-6">
-            {/* Vehicle Details */}
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
               <img
                 src={vehicleData?.image}

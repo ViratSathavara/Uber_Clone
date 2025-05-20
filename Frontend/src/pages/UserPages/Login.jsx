@@ -7,10 +7,11 @@ import { UserDataContext } from "../../context/UserContext";
 import { showErrorToast, showSuccessToast } from "../../CommonComponents/Toast";
 import axios from "axios";
 import AuthService from "../../services/AuthService";
+import Loader from "../../CommonComponents/Loader";
 
 const Login = () => {
   const [loginType, setLoginType] = useState("user");
-  const [userData, setUserData] = useState({});
+  const [isLoading, setIsLoading] = useState("");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { setAuth } = useUserAuth();
@@ -19,75 +20,55 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
 
   const newUser = {
     email,
     password,
   };
 
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BASE_HOSTED_URI}/users/login`, 
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_HOSTED_URI}/users/login`,
       newUser,
-      {
+        {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
-    );
+        }
+      );
 
-    if (response.status === 200) {
+      if (response.status === 200) {
       showSuccessToast('User Login Successfully...');
-      const { token, user } = response.data.data;
-      AuthService.setUserAuth(token, user);
-      setUser(user);
-      navigate('/home');
-    }
+        const { token, user } = response.data.data;
+        AuthService.setUserAuth(token, user);
+        setUser(user);
+        navigate('/home');
+      }
 
     // Reset form
     setEmail('');
     setPassword('');
 
-  } catch (error) {
-    console.error('Login error:', error);
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      showErrorToast(error.response.data.message || 'Login failed');
-    } else if (error.request) {
-      // The request was made but no response was received
-      showErrorToast('Network error - could not connect to server');
-    } else {
-      // Something happened in setting up the request
-      showErrorToast('Error setting up login request');
+    } catch (error) {
+      console.error('Login error:', error);
+      showErrorToast(error.response?.data?.message);
+    } finally {
+      setIsLoading(false);
     }
-  }
-};
+  };
 
   return (
     <>
-      <img
-        src="../assets/Uber-Logo.png"
-        alt="uber-logo"
-        className="w-24 absolute"
-      />
+      <img src="../assets/Uber-Logo.png" alt="uber-logo" className="w-24 absolute" />
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <form
-          onSubmit={(e) => handleSubmit(e)}
-          className="w-full max-h-[550px] overflow-auto max-w-md p-8 space-y-6 bg-gray-200 rounded-lg shadow-md"
-        >
+        <form onSubmit={handleSubmit} className="w-full max-h-[550px] overflow-auto max-w-md p-8 space-y-6 bg-gray-200 rounded-lg shadow-md">
           <div className="flex flex-col justify-center items-center w-full space-y-4">
-            <LoginTypeToggle
-              loginType={loginType}
-              setLoginType={setLoginType}
-            />
-
+            <LoginTypeToggle loginType={loginType} setLoginType={setLoginType} />
             <div className="w-full">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 What is your Email?
               </label>
               <TextField
@@ -99,12 +80,7 @@ const handleSubmit = async (e) => {
                 variant="outlined"
                 required
                 fullWidth
-                InputProps={{
-                  className: "rounded-lg bg-gray-50",
-                }}
-                InputLabelProps={{
-                  className: "text-gray-500",
-                }}
+                InputProps={{ className: "rounded-lg bg-gray-50" }}
               />
             </div>
 
@@ -135,9 +111,10 @@ const handleSubmit = async (e) => {
                 type="submit"
                 variant="contained"
                 fullWidth
+                disabled={isLoading}
                 className="!py-3 !bg-black hover:bg-gray-900 text-white font-medium rounded-lg shadow-sm transition-colors duration-300"
               >
-                Sign In
+                {isLoading ? <Loader /> : "Sign In"}
               </Button>
             </div>
 

@@ -35,7 +35,7 @@ const Home = () => {
 
   useEffect(() => {
     sendMessage('join', {
-      userId: JSON.parse(user)._id,
+      userId: user?._id,
       userType: 'user',
     })
   }, []);
@@ -53,15 +53,12 @@ const Home = () => {
     }
 
     try {
-      // Get token from localStorage
       const token = localStorage.getItem('user_token');
 
-      // Check if token exists
       if (!token) {
         throw new Error('No authentication token found');
       }
 
-      // Verify token expiration (optional)
       const payload = JSON.parse(atob(token.split('.')[1]));
       if (payload.exp * 1000 < Date.now()) {
         localStorage.removeItem('user_token');
@@ -73,7 +70,7 @@ const Home = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        timeout: 5000 // Add timeout to prevent hanging
+        timeout: 5000
       });
 
       if (res.data && Array.isArray(res.data)) {
@@ -85,14 +82,8 @@ const Home = () => {
     } catch (error) {
       console.error('Error fetching pickup suggestions:', error);
 
-      // Handle 401 specifically
       if (error.response?.status === 401) {
-        // Remove invalid token
         localStorage.removeItem('user_token');
-        // Optionally redirect to login or show login modal
-        // navigate('/login');
-        // Or show toast notification
-        // toast.error('Session expired. Please login again.');
       }
 
       setPickupSuggestions([]);
@@ -135,20 +126,19 @@ const Home = () => {
 
   const createRide = useCallback(async () => {
     try {
-      // Validate required fields
       if (!pickup || !destination) {
         throw new Error('Pickup, destination, and vehicle type are required');
       }
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_HOSTED_URI}/ride/create`,
-        {  // Request body
+        {
           pickup,
           destination,
           fullPickup,
           fullDestination,
           vehicleType: vehicle?.type
         },
-        {  // Config
+        {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('user_token')}`,
             'Content-Type': 'application/json'
@@ -165,7 +155,7 @@ const Home = () => {
       }
     } catch (error) {
       console.error('Error creating ride:', error);
-      throw error;  // Re-throw for handling in ConfirmRide component
+      throw error;
     }
   }, [vehicle]);
 
