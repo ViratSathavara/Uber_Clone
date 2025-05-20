@@ -5,16 +5,18 @@ import axios from 'axios';
 import { showSuccessToast, showErrorToast } from '../../CommonComponents/Toast';
 import { useUserAuth } from '../../CustomHooks/useAuth';
 import AuthService from "../../services/AuthService";
+import { CircularProgress } from '@mui/material';
+import Loader from "../../CommonComponents/Loader";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    mobile: '',
     email: '',
     password: ''
   });
-
-  const { setAuth } = useUserAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -24,43 +26,46 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const newUser = {
       fullname: {
         firstname: formData.firstName,
         lastname: formData.lastName,
       },
+      mobile: formData.mobile,
       email: formData.email,
       password: formData.password,
     };
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_HOSTED_URI}/users/register`, newUser,
-        {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true // if using cookies/sessions
-  }
-      );
-      
+      const response = await axios.post(`${import.meta.env.VITE_BASE_HOSTED_URI}/users/register`, newUser, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true
+      });
+
       if (response?.status === 201) {
         showSuccessToast('User Created Successfully...');
         const { token, user } = response.data.data;
         AuthService.setUserAuth(token, user);
         navigate('/home');
       }
-      // Reset form
+
       setFormData({
         firstName: '',
         lastName: '',
+        mobile: '',
         email: '',
         password: ''
       });
-      
+
     } catch (error) {
       console.error('Signup error:', error);
       showErrorToast(error?.response?.data?.error);
+    } finally {
+      setIsLoading(false); // Stop loading in any case
     }
   };
 
@@ -108,6 +113,23 @@ const Signup = () => {
             </div>
 
             <div className="w-full">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Enter your Mobile No.
+                          </label>
+                          <TextField
+                            name="mobile"
+                            type="number"
+                            value={formData.mobile}
+                            onChange={handleChange}
+                            placeholder="1234567890"
+                            variant="outlined"
+                            required
+                            fullWidth
+                            InputProps={{ className: "rounded-lg bg-gray-50" }}
+                          />
+                        </div>
+
+            <div className="w-full">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Enter your Email
               </label>
@@ -146,9 +168,14 @@ const Signup = () => {
                 type="submit"
                 variant="contained"
                 fullWidth
+                disabled={isLoading}
                 className="!py-3 !bg-black hover:bg-gray-900 text-white font-medium rounded-lg shadow-sm transition-colors duration-300"
               >
-                Sign Up
+                {isLoading ? (
+                  <Loader />
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
             </div>
 

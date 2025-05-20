@@ -6,19 +6,21 @@ import { CaptainDataContext } from "../../context/CaptainContext";
 import axios from "axios";
 import { showErrorToast, showSuccessToast } from "../../CommonComponents/Toast";
 import AuthService from "../../services/AuthService";
+import Loader from "../../CommonComponents/Loader";
 
 const CaptainLogin = () => {
   const [loginType, setLoginType] = useState("captain");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { captain, setCaptain } = useContext(CaptainDataContext)
+  const { setCaptain } = useContext(CaptainDataContext)
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true);
     const newcaptain = {
       email,
       password,
@@ -42,7 +44,9 @@ const CaptainLogin = () => {
 
     } catch (error) {
       console.error('Signup error:', error);
-      showErrorToast(error);
+      showErrorToast(error.response.data.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -114,9 +118,14 @@ const CaptainLogin = () => {
                 type="submit"
                 variant="contained"
                 fullWidth
+                disabled={isLoading}
                 className="!py-3 !bg-black hover:bg-gray-900 text-white font-medium rounded-lg shadow-sm transition-colors duration-300"
               >
-                Sign In
+                {isLoading ? (
+                  <Loader />
+                ) : (
+                  "Sign In"
+                )}
               </Button>
             </div>
 

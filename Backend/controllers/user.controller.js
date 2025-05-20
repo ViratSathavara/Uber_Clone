@@ -1,4 +1,5 @@
 const userModel = require('../models/user.model');
+const captainModel = require('../models/captain.model');
 const userServices = require('../services/user.servies');
 const { validationResult } = require('express-validator');
 const blacklistTokenModel = require('../models/blacklistToken.model');
@@ -12,12 +13,18 @@ module.exports.registerUser = async(req, res, next) => {
         return res.status(422).json({ errors: errors.array() });
     }
 
-    const { fullname, email, password } = req.body;
+    const { fullname, mobile, email, password } = req.body;
 
+    const isCaptainAlreadyExist = await captainModel.findOne({ email });
+    const isCaptainAlreadyExistByPhone = await captainModel.findOne({ mobile });
     const isUserAlreadyExist = await userModel.findOne({ email });
+    const isUserAlreadyExistByPhone = await userModel.findOne({ mobile });
 
-    if (isUserAlreadyExist) {
+    if (isCaptainAlreadyExist || isCaptainAlreadyExistByPhone) {
         return res.status(400).json({ error: 'Captain already exists' });
+    }
+    if (isUserAlreadyExist || isUserAlreadyExistByPhone) {
+        return res.status(400).json({ error: 'User already exists' });
     }
 
     const hashedPassword = await userModel.hashPassword(password);
@@ -25,10 +32,10 @@ module.exports.registerUser = async(req, res, next) => {
     const user = await userServices.createUser({
         firstname: fullname.firstname,
         lastname: fullname.lastname,
+        mobile,
         email,
         password: hashedPassword,
     });
-
     const token = await user.generateAuthToken();
 
     res.status(201).json({

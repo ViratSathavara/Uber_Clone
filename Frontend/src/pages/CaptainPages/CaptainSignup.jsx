@@ -5,18 +5,21 @@ import axios from 'axios';
 import { showSuccessToast, showErrorToast } from '../../CommonComponents/Toast';
 import { useCaptainAuth } from '../../CustomHooks/useAuth';
 import AuthService from "../../services/AuthService";
+import Loader from "../../CommonComponents/Loader";
 
 const CaptainSignup = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    mobile: '',
     password: '',
     color: '#000000',
     plate: '',
     capacity: '',
     vehicleType: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const { setAuth } = useCaptainAuth();
   const navigate = useNavigate();
@@ -28,12 +31,14 @@ const CaptainSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const newCaptain = {
       fullname: {
         firstname: formData.firstName,
         lastname: formData.lastName,
       },
+      mobile: formData.mobile,
       email: formData.email,
       password: formData.password,
       vehicle: {
@@ -46,7 +51,7 @@ const CaptainSignup = () => {
 
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_HOSTED_URI}/captain/register`, newCaptain);
-      
+
       if (response?.status === 201) {
         showSuccessToast('Captain Account Created Successfully...');
         console.log(response)
@@ -54,7 +59,7 @@ const CaptainSignup = () => {
         AuthService.setCaptainAuth(token, captain);
         navigate('/captain-home');
       }
-      
+
       // Reset form
       setFormData({
         firstName: '',
@@ -66,13 +71,14 @@ const CaptainSignup = () => {
         capacity: '',
         vehicleType: ''
       });
-      
+
     } catch (error) {
       console.error('Signup error:', error);
-      const errorMsg = error.response?.data?.message || 
-                      JSON.parse(error?.request?.response).errors[0]?.msg || 
-                      'Something went wrong!';
-      showErrorToast(errorMsg);
+      const errorMsg = error.response?.data?.message;
+      showErrorToast(error?.response?.data?.error);
+    }
+    finally {
+      setIsLoading(false); // Stop loading in any case
     }
   };
 
@@ -117,6 +123,23 @@ const CaptainSignup = () => {
                   InputProps={{ className: "rounded-lg bg-gray-50" }}
                 />
               </div>
+            </div>
+
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Enter your Mobile No.
+              </label>
+              <TextField
+                name="mobile"
+                type="number"
+                value={formData.mobile}
+                onChange={handleChange}
+                placeholder="1234567890"
+                variant="outlined"
+                required
+                fullWidth
+                InputProps={{ className: "rounded-lg bg-gray-50" }}
+              />
             </div>
 
             <div className="w-full">
@@ -233,7 +256,7 @@ const CaptainSignup = () => {
                 fullWidth
                 className="!py-3 !bg-black hover:bg-gray-900 text-white font-medium rounded-lg shadow-sm transition-colors duration-300"
               >
-                Sign Up as Captain
+                {isLoading ? <Loader /> : "Sign Up"}
               </Button>
             </div>
 
