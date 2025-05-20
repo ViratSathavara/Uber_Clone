@@ -18,12 +18,10 @@ const CaptainHome = () => {
     const [openPopup, setOpenPopup] = useState(false)
     const [confirmRidePopup, setConfirmRidePopup] = useState(false)
     const { captain } = React.useContext(CaptainDataContext);
-    const navigate = useNavigate();
     const token = localStorage.getItem('captain_token')
     const { socket, sendMessage, receiveMessage } = useSocket();
     const [ride, setRide] = useState(null);
     const [confirmRideData, setConfirmRideData] = useState(null);
-    const [otp, setOtp] = useState('')
 
 
     useEffect(() => {
@@ -55,6 +53,7 @@ const CaptainHome = () => {
     }, []);
 
     socket.on('new-ride', (data) => {
+        console.log('new-ride', data)
         setRide(data);
         setOpenPopup(true);
     })

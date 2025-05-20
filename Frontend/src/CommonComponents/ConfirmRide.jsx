@@ -2,15 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import { Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import LookingForDriver from './LookingForDriver';
 import DriverProfile from './DriverProfile';
+import BackButton from './BackButton';
 
-const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData, setDriverData }) => {
-  const navigate = useNavigate();
+const ConfirmRide = ({ vehicleData, createRide, setConfirmRide, fullPickup, fullDestination, driverData, setDriverData, setVehiclePanel, setVehicle }) => {
   const [rideStatus, setRideStatus] = useState('confirm');
   const timeoutRef = useRef(null);
-  
+
   useEffect(() => {
     if (driverData?._id) {
       setRideStatus('driver_found');
@@ -21,7 +20,7 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData,
   const handleConfirmRide = () => {
     createRide();
     setRideStatus('searching');
-    
+
     timeoutRef.current = setTimeout(() => {
       if (!driverData?._id) {
         setRideStatus('not_found');
@@ -38,12 +37,12 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData,
   switch (rideStatus) {
     case 'searching':
       return (
-        <LookingForDriver />
+        <LookingForDriver setRideStatus={setRideStatus} setVehiclePanel={setVehiclePanel} setConfirmRide={setConfirmRide} setVehicle={setVehicle} timeoutRef={timeoutRef} />
       );
-    
+
     case 'driver_found':
       return (
-        <DriverProfile 
+        <DriverProfile
           driver={driverData}
           vehicle={vehicleData}
           onCancel={() => {
@@ -53,13 +52,21 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData,
           }}
         />
       );
-    
+
     case 'not_found':
       return (
         <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md text-center">
+          <BackButton
+            onClick={() => {
+              setVehiclePanel(true);
+              setConfirmRide(false);
+              setVehicle({});
+              clearTimeout(timeoutRef.current);
+            }}
+          />
           <h1 className="text-2xl font-bold mb-4">Driver Not Found</h1>
           <p className="text-gray-600 mb-6">Sorry, we couldn't find a driver for your ride.</p>
-          <Button 
+          <Button
             onClick={() => {
               setRideStatus('confirm');
               clearTimeout(timeoutRef.current);
@@ -70,7 +77,7 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData,
           </Button>
         </div>
       );
-    
+
     default:
       return (
         <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md">
@@ -95,7 +102,8 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData,
                 <AddLocationIcon className="text-black text-3" />
                 <h1 className="text-sm font-medium text-gray-500">Pickup Location</h1>
               </div>
-              <h2 className="text-lg font-semibold mt-1">{pickup?.suggestion}</h2>
+              <h2 className="text-lg font-semibold mt-1">{fullPickup?.structured_formatting?.secondary_text || ''}</h2>
+              <h2 className="text-sm text-gray-600 font-semibold mt-1">{fullPickup.description}</h2>
             </div>
 
             {/* Destination Location */}
@@ -104,7 +112,8 @@ const ConfirmRide = ({ vehicleData, createRide, pickup, destination, driverData,
                 <WhereToVoteIcon className="text-black text-3" />
                 <h1 className="text-sm font-medium text-gray-500">Destination Location</h1>
               </div>
-              <h2 className="text-lg font-semibold mt-1">{destination?.suggestion}</h2>
+              <h2 className="text-lg font-semibold mt-1">{fullDestination?.structured_formatting?.secondary_text || ''}</h2>
+              <h2 className="text-sm text-gray-600 font-semibold mt-1">{fullDestination.description}</h2>
             </div>
 
             {/* Price */}

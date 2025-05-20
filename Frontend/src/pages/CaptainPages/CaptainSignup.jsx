@@ -225,7 +225,7 @@ const CaptainSignup = () => {
                   className="rounded-lg bg-gray-50"
                 >
                   <MenuItem value="" disabled>Select Vehicle Type</MenuItem>
-                  {["Car", "Bike", "Auto"].map((type) => (
+                  {['UberGo', 'auto', 'bike', 'UberXL'].map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
                 </Select>

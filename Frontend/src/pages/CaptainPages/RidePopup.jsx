@@ -4,7 +4,6 @@ import AddLocationIcon from '@mui/icons-material/AddLocation';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 
 const RidePopup = ({ confirmRide={confirmRide}, ride, setOpenPopup, setConfirmRidePopup }) => {
-    console.log('ride', ride);
     return (
         <div>
             <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md">
@@ -16,7 +15,7 @@ const RidePopup = ({ confirmRide={confirmRide}, ride, setOpenPopup, setConfirmRi
                         className="w-16 h-16 rounded-full object-cover border-2 border-blue-500"
                     />
                     <div className='flex items-end flex-col'>
-                        <h2 className='text-2xl font-bold'>{ride?.user?.fullname?.firstname + " " + ride?.user?.fullname?.firstname}</h2>
+                        <h2 className='text-2xl font-bold'>{ride?.user?.fullname?.firstname + " " + ride?.user?.fullname?.lastname}</h2>
                         <p>2.4 km</p>
                     </div>
                 </div>

@@ -16,8 +16,8 @@ router.post('/register', [
     body('vehicle.capacity').isInt({ min: 1 }).withMessage('Vehicle capatioy must be at least 1 sheet'),
     body('vehicle.vehicleType')
     .customSanitizer(value => value.toLowerCase())
-    .isIn(['car', 'auto', 'bike'])
-    .withMessage('Vehicle type must be one of the following: car, auto, bike'),
+    .isIn(['UberGo', 'auto', 'bike', 'UberXL'], )
+    .withMessage('Vehicle type must be one of the following: UberGo, auto, bike, UberXL'),
 
 ], captainController.registerCaptain);
 

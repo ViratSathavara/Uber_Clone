@@ -34,12 +34,14 @@ module.exports.createRide = async(req, res) => {
 
 
         const captainsInRadius = await mapService.getCaptainInTheRadius(pickupCoordinates.ltd, pickupCoordinates.lng, 2);
+        console.log('captainsInRadius', captainsInRadius)
 
         const rideWithUser = await rideModel.findOne(ride._id).populate('user')
         rideWithUser.otp = "";
 
 
         captainsInRadius.map(async(captain) => {
+            console.log('captain', captain)
             sendMessageToSocketId(captain.socketId, {
                 event: 'new-ride',
                 data: rideWithUser
@@ -64,8 +66,14 @@ module.exports.getFare = async(req, res) => {
         const fare = await rideService.getFare(pickup, destination);
         return res.status(200).json(fare);
     } catch (error) {
-        console.error("Error fetching fare:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        if (error.status === 404) {
+            return res.status(404).json({ message: error.message });
+        } else if (error.status === 400) {
+            return res.status(400).json({ message: error.message });
+        } else {
+            console.error("Error fetching fare:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
     }
 }
 

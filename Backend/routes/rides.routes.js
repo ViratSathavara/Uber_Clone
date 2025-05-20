@@ -8,7 +8,7 @@ router.post('/create',
     authMiddleware.authUser,
     body('pickup').isLength({ min: 1 }).withMessage('Pickup location is required'),
     body('destination').isLength({ min: 1 }).withMessage('Destination location is required'),
-    body('vehicleType').isIn(['auto', 'car', 'bike']).withMessage('Invalid vehicle type'),
+    body('vehicleType').isIn(['UberGo', 'auto', 'bike', 'UberXL'], ).withMessage('Invalid vehicle type'),
     rideController.createRide,
 
     (req, res) => {
