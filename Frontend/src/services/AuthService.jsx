@@ -12,7 +12,7 @@ class AuthService {
 
   static getUserData() {
     const user = localStorage.getItem('user_data');
-    return user ? JSON.parse(user) : null;
+    return user ? user : null;
   }
 
   static isUserAuthenticated() {
@@ -32,7 +32,7 @@ class AuthService {
 
   static getCaptainData() {
     const captain = localStorage.getItem('captain_data');
-    return captain ? JSON.parse(captain) : null;
+    return captain ? captain : null;
   }
 
   static isCaptainAuthenticated() {
